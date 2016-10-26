@@ -23,38 +23,28 @@ def idf():
     objnames = idf_helpers.idfobjectkeys(idf)
     allidfobjects = [idf.idfobjects[objname.upper()] for objname in objnames]
     numobjects = [len(idfobjects) for idfobjects in allidfobjects]
-    objsnums = ["%s -> %s" % (objname, num) 
-            for objname, num in zip(objnames, numobjects)
+    objsnums = [(i, "%s - %s -> %s" % (i, objname, num)) 
+            for i, (objname, num) in enumerate(zip(objnames, numobjects))
             if num > 0]
-    html = "<br>".join(objsnums)
-    return codetag(html)
+    linklines = ['<a href="0/%s">%s</a>' % (i, line, ) for i, line in objsnums]
+    html = "<br>".join(linklines)
+    return html # codetag(html)
     
-@route('/page1')
-def page1():
-    objnames = eppystuff.objnames()
-    [objname for objname in objnames]
-    return '<br>'.join(objnames)
-
-@route('/page2')
-def page2():
-    nlens = eppystuff.page2()
-    nlens = ['%s -> %s' % (name, ln) for name, ln in nlens]
-    return '<br>'.join(nlens)
-    
-
 @route('/idf/0/<keyindex:int>')
-def idfobject(keyindex):
+def theidfobjects(keyindex):
     # try keyindex 84
     idf = eppystuff.getidf()
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
     idfobjects = idf.idfobjects[objname]
-    numobjects = len(idfobjects)
-    html = "%s -> %s" % (objname, numobjects)
-    return codetag(html)
+    objnames = [(i, str(idfobject.obj[1])) for i, idfobject in enumerate(idfobjects)]
+    linklines = ['<a href="%s/%s">%s</a>' % (keyindex, i, line, ) for i, line in objnames]
+    lines = [objname, '='*len(objname)] + linklines
+    html = "<br>".join(lines)
+    return html # codetag(html)
 
 @route('/idf/0/<keyindex:int>/<objindex:int>')
-def idfobject(keyindex, objindex):
+def theidfobject(keyindex, objindex):
     # try keyindex 84
     idf = eppystuff.getidf()
     objnames = idf_helpers.idfobjectkeys(idf)
@@ -63,12 +53,17 @@ def idfobject(keyindex, objindex):
     idfobject = idfobjects[objindex]
     idfobjstr = str(idfobject)
     lines = idfobjstr.splitlines()
-    html = '<br>'.join(lines)
+    lines.pop(0) # there is a blank line here
+    linesfields = [(idfobject.objls[i+1], line) for i, line in enumerate(lines[1:])]
+    linklines = ['<a href="%s/%s">%s</a>' % (objindex, fieldname, line, ) 
+                        for i, (fieldname, line) in enumerate(linesfields)]
+    linklineswithtitle = [objname, '='*len(objname)] + linklines
+    html = '<br>'.join(linklineswithtitle)
     # return '<code>%s</code>' % (html, )
-    return codetag(html)
+    return html
 
 @route('/idf/0/<keyindex:int>/<objindex:int>/<field>')
-def idfobjectfield(keyindex, objindex, field):
+def theidfobjectfield(keyindex, objindex, field):
     # try keyindex 84
     idf = eppystuff.getidf()
     objnames = idf_helpers.idfobjectkeys(idf)

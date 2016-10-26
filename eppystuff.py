@@ -16,7 +16,8 @@ def getidf():
     
 def objnames():
     """return obj names"""
-    return [anobj[0]['idfobj'] for anobj in idf.idd_info]   
+    # return [anobj[0]['idfobj'] for anobj in idf.idd_info]
+    return idf_helpers.idfobjectkeys(idf)
 
 def page2():
     idf = getidf()

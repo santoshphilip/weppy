@@ -1,0 +1,20 @@
+2016-10-26
+----------
+url design
+
+- /
+    - some kind of start page
+- /0/
+    - file 1 (index 0)
+- /0/3
+    - 3 is object BUILDING
+- /0/3/0
+    - first building object
+- 0/3/0/North_Axis
+    - value of building.North_Axis
+
+2016-10-26
+----------
+
+need mods in eppy to make this easier to run:
+- get all the idd object names in the right order DONE - in branch eppy/weppy

@@ -18,3 +18,13 @@ url design
 
 need mods in eppy to make this easier to run:
 - get all the idd object names in the right order DONE - in branch eppy/weppy
+
+
+stage1
+------
+just see a hard coded file. no links
+
+stage2
+------
+- has links to next level.
+- also has links to get_referenced_object s.

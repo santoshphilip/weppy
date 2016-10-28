@@ -1,6 +1,7 @@
 from bottle import route, run
 import eppystuff
 import eppy.idf_helpers as idf_helpers
+from eppy.bunch_subclass import EpBunch
 
 # idf = eppystuff.makeanidf()
 aspace = "&emsp;"
@@ -59,7 +60,29 @@ def refobjlink(idf, obj):
         return linktag
     else:
         return ""
-
+        
+def bunch__functions(idfobject):
+    """return function name and result"""        
+    funcdct = idfobject.__functions
+    funcsresults = [(key, funcdct[key](idfobject)) for key in funcdct.keys()]
+    return funcsresults
+    
+def epbunchlist2html(epbunchlist):
+    """convert funcsbunchlist to lines"""
+    def epbunch2html(epbunch):
+        lines = epbunch.obj[:2]
+        return '->'.join(lines)
+    lines = [epbunch2html(epbunch) for epbunch in epbunchlist]
+    return ", ".join(lines)
+    
+def funcsresults2lines(funcsresults):
+    """return lines of funcsresults"""
+    funcssimple = [(func, value) for func, value in funcsresults if not isinstance(value, list)]
+    funcslist = [(func, value) for func, value in funcsresults if isinstance(value, list)]
+    funcsbunchlist = [(func, epbunchlist2html(values)) for func, values in funcslist if isinstance(values[0], EpBunch)]
+    cleanfuncsresults = funcssimple + funcsbunchlist
+    lines = ["%s = %s" % (func, value) for func, value in cleanfuncsresults]
+    return lines
 
 @route('/idf/0/<keyindex:int>/<objindex:int>')
 def theidfobject(keyindex, objindex):
@@ -81,7 +104,11 @@ def theidfobject(keyindex, objindex):
                 for linktag, field, refobjtxt in zip(linktags, fields, refobjtxts)]
     lines.pop(0)
     lineswithtitle = [objkey, '='*len(objkey)] + lines
-    html = '<br>'.join(lineswithtitle)
+    funcsresults = bunch__functions(idfobject)
+    funclines = funcsresults2lines(funcsresults)
+    # for line in funclines:
+    #     print line
+    html = '<br>'.join(lineswithtitle + ["<hr>", ] + funclines)
     # return '<code>%s</code>' % (html, )
     return html
 

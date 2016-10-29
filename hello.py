@@ -133,8 +133,8 @@ def theidfobject(keyindex, objindex):
     urls = ["%s/%s" % (objindex, field) for field in fields]
     linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,) 
                     for i, (url, value) in enumerate(zip(urls, values))]
-    iddinfos = ['<a href=%s>%s</a>' % (i, '?')  
-                        for i in range(len(linktags))]
+    iddinfos = ['<a href=%s/iddinfo>%s</a>' % (url, '?')  
+                        for url in urls]
     lines = ["%s %s %s %s %s" % (linktag, aspace, field, abullet, iddinfo) 
                 for linktag, field, iddinfo in zip(linktags, fields, iddinfos)]
     # ---
@@ -142,16 +142,17 @@ def theidfobject(keyindex, objindex):
     url = 'showlinks/%s' % (objindex, )
     showlinkslink = '<a href=%s>show links to other objects</a> <hr>' % (url, )
     
-    url = 'andmore/%s' % (objindex, )
-    andmorelink = '<hr> <a href=%s>run functions of this object</a>' % (url, )
-    lines.append(andmorelink)
+    url = 'objfunctions/%s' % (objindex, )
+    objfunctionslink = '<hr> <a href=%s>run functions of this object</a>' % (url, )
+    lines.append(objfunctionslink)
     url = 'refferingobjs/%s' % (objindex, )
     refferingobjslink = '<a href=%s>Show objects that refer to this object</a>' % (url, )
     lines.append(refferingobjslink)
     url = 'mentioningobjs/%s' % (objindex, )
     mentioningobjslink = '<a href=%s>Show objects that mention this object</a>' % (url, )
     lines.append(mentioningobjslink)
-    lineswithtitle = [objkey, '='*len(objkey)] + lines
+    heading = '%s <a href=%s/key/iddinfo> %s</a>' % (objkey, objindex, '?')
+    lineswithtitle = [heading, "=" * len(objkey)] + lines
     lineswithtitle.insert(0, showlinkslink)
     html = '<br>'.join(lineswithtitle)
     return html
@@ -173,15 +174,16 @@ def theidfobjectshowlinks(keyindex, objindex):
                     for i, (url, value) in enumerate(zip(urls, values))]
     refobjtxts = [refobjlink(idf, refobj) for refobj in refobjs]
     lines = ["%s %s %s %s" % (linktag, aspace, field, refobjtxt) 
-                for linktag, field, refobjtxt in zip(linktags, fields, refobjtxts)]
+                for linktag, field, refobjtxt in zip(linktags, 
+                                                        fields, 
+                                                        refobjtxts)]
     lines.pop(0)
     lineswithtitle = [objkey, '='*len(objkey)] + lines
     html = '<br>'.join(lineswithtitle)
     return html
 
-@route('/idf/0/<keyindex:int>/andmore/<objindex:int>')
-def theidfobjectandmore(keyindex, objindex):
-    # TODO rename andmore
+@route('/idf/0/<keyindex:int>/objfunctions/<objindex:int>')
+def theidfobjectobjfunctions(keyindex, objindex):
     idf = eppystuff.getidf()
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
@@ -255,10 +257,11 @@ def theidfobjectfield(keyindex, objindex, field):
     objname = objnames[keyindex]
     idfobjects = idf.idfobjects[objname]
     idfobject = idfobjects[objindex]
-    html = "%s <- %s"  % (idfobject[field], field)
+    html = "%s <- %s . <i>Editable in the future</i>"  % (idfobject[field], field)
+    print html
     return codetag(html)
 
-@route('/idf/0/<keyindex:int>/<objindex:int>/<field>')
+@route('/idf/0/<keyindex:int>/<objindex:int>/<field>/iddinfo')
 def theiddinfo(keyindex, objindex, field):
     # try keyindex 84
     idf = eppystuff.getidf()
@@ -266,7 +269,21 @@ def theiddinfo(keyindex, objindex, field):
     objname = objnames[keyindex]
     idfobjects = idf.idfobjects[objname]
     idfobject = idfobjects[objindex]
-    html = "%s <- %s"  % (idfobject[field], field)
+    iddinfo = idfobject.getfieldidd(field)
+    lines = []
+    for key, val in iddinfo.items():
+        if len(val) == 1:
+            if val[0] == '':
+                lines.append('%s' % (key, ))
+            else:
+                lines.append('%s = %s' % (key, val[0]))
+        else:
+            lines.append('%s = %s' % (key, val))
+    heading = '%s%s%s' % (idfobject.key.upper(), abullet, field)
+    heading = heading.strip()
+    lines.insert(0, "=" * (len(heading)-len(abullet)+1))
+    lines.insert(0, heading)
+    html = '<br>'.join(lines)
     return codetag(html)
 
 run(host='localhost', port=8080, debug=True)

@@ -28,3 +28,11 @@ stage2
 ------
 - has links to next level.
 - also has links to get_referenced_object s.
+
+stage3
+------
+- has links to 
+    - show links to other objects
+    - run functions of this object
+    - Show objects that refer to this object
+    - Show objects that mention this object

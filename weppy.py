@@ -168,7 +168,7 @@ def theidfobject(idfindex, keyindex, objindex):
     objfunctionslink = '<hr> <a href=%s>run functions of this object</a>' % (url, )
     lines.append(objfunctionslink)
     url = 'refferingobjs/%s' % (objindex, )
-    refferingobjslink = '<a href=%s>Show objects that refer to this object</a>' % (url, )
+    refferingobjslink = '<a href=%s>Show objects that refer to this object</a> ->this runs slow :-(' % (url, )
     lines.append(refferingobjslink)
     url = 'mentioningobjs/%s' % (objindex, )
     mentioningobjslink = '<a href=%s>Show objects that mention this object</a>' % (url, )

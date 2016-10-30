@@ -36,3 +36,8 @@ stage3
     - run functions of this object
     - Show objects that refer to this object
     - Show objects that mention this object
+
+stage4
+------
+- home page at http://localhost:8080
+- opens files in ./'./idffilenames.txt'

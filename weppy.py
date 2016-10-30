@@ -60,7 +60,7 @@ def theidfobjects(idfindex, keyindex):
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
     idfobjects = idf.idfobjects[objname]
-    objnames = [(i, str(idfobject.obj[1])) for i, idfobject in enumerate(idfobjects)]
+    objnames = [(i, str(idfobject.fieldvalues[1])) for i, idfobject in enumerate(idfobjects)]
     linklines = ['<a href="%s/%s">%s %s %s</a>' % (keyindex, i, i, abullet, line, ) for i, line in objnames]
     title = "ALL %sS" % (objname, )
     lines = [title, '='*len(title)] + linklines
@@ -90,7 +90,7 @@ def bunch__functions(idfobject):
 def epbunchlist2html(epbunchlist):
     """convert funcsbunchlist to lines"""
     def epbunch2html(epbunch):
-        lines = epbunch.obj[:2]
+        lines = epbunch.fieldvalues[:2]
         return '->'.join(lines)
     lines = [epbunch2html(epbunch) for epbunch in epbunchlist]
     return ", ".join(lines)
@@ -112,7 +112,7 @@ def getreferingobjs(idfindex, idfobject):
     idf = idfs[idfindex]
     refobjs = idfobject.getreferingobjs() 
     keys = [refobj.key for refobj in refobjs]   
-    objnames = [refobj.obj[1] for refobj in refobjs] 
+    objnames = [refobj.fieldvalues[1] for refobj in refobjs] 
     idfkeys = idf_helpers.idfobjectkeys(idf)
     keysobjsindexes = [(idfkeys.index(refobj.key.upper()), 
                         idf.idfobjects[refobj.key.upper()].index(refobj))
@@ -129,7 +129,7 @@ def getmentioningobjs(idfindex, idfobject):
     idf = idfs[idfindex]
     mentioningobjs = idf_helpers.getanymentions(idf, idfobject)
     keys = [mentioningobj.key for mentioningobj in mentioningobjs]   
-    objnames = [mentioningobj.obj[1] for mentioningobj in mentioningobjs] 
+    objnames = [mentioningobj.fieldvalues[1] for mentioningobj in mentioningobjs] 
     idfkeys = idf_helpers.idfobjectkeys(idf)
     keysobjsindexes = [(idfkeys.index(mentioningobj.key.upper()), 
                             idf.idfobjects[mentioningobj.key.upper()].index(mentioningobj))
@@ -149,8 +149,8 @@ def theidfobject(idfindex, keyindex, objindex):
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
     idfobject = idfobjects[objindex]
-    fields = idfobject.objls
-    values = idfobject.obj
+    fields = idfobject.fieldnames
+    values = idfobject.fieldvalues
     valuesfields = [(value, field) for value, field in zip(values, fields)]
     urls = ["%s/%s" % (objindex, field) for field in fields]
     linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,) 
@@ -189,9 +189,17 @@ def theidfobjectshowlinks(idfindex, keyindex, objindex):
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
     idfobject = idfobjects[objindex]
-    fields = idfobject.objls
-    values = idfobject.obj
-    refobjs = [idfobject.get_referenced_object(fieldname) for fieldname in idfobject.objls]
+    fields = idfobject.fieldnames
+    values = idfobject.fieldvalues
+    refobjs = [idfobject.get_referenced_object(fieldname) 
+                    for fieldname in idfobject.fieldnames]
+    # nrefobjs -> objects that are not referenced, so use the previous field
+    nrefobjs = [idf_helpers.getobject_use_prevfield(idf, idfobject, fieldname) 
+                        for fieldname in idfobject.fieldnames]
+    # merge nrefobjs inot refobjs
+    for i, (obj1, obj2) in enumerate(zip(refobjs, nrefobjs)):
+        if not obj1:
+            refobjs[i] = obj2
     valuesfields = [(value, field) for value, field in zip(values, fields)]
     urls = ["%s/%s" % (objindex, field) for field in fields]
     linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,) 
@@ -215,8 +223,8 @@ def theidfobjectobjfunctions(idfindex, keyindex, objindex):
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
     idfobject = idfobjects[objindex]
-    fields = idfobject.objls
-    values = idfobject.obj
+    fields = idfobject.fieldnames
+    values = idfobject.fieldvalues
     valuesfields = [(value, field) for value, field in zip(values, fields)]
     urls = ["../%s/%s" % (objindex, field) for field in fields]
     linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,) 
@@ -240,8 +248,8 @@ def theidfobjectrefferingobjs(idfindex, keyindex, objindex):
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
     idfobject = idfobjects[objindex]
-    fields = idfobject.objls
-    values = idfobject.obj
+    fields = idfobject.fieldnames
+    values = idfobject.fieldvalues
     valuesfields = [(value, field) for value, field in zip(values, fields)]
     urls = ["../%s/%s" % (objindex, field) for field in fields]
     linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,) 
@@ -264,8 +272,8 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
     idfobject = idfobjects[objindex]
-    fields = idfobject.objls
-    values = idfobject.obj
+    fields = idfobject.fieldnames
+    values = idfobject.fieldvalues
     valuesfields = [(value, field) for value, field in zip(values, fields)]
     urls = ["../%s/%s" % (objindex, field) for field in fields]
     linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,) 

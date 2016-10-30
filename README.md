@@ -22,6 +22,8 @@ run:
 
 python weppy.py
 
+open "http://localhost:8080" in your browser
+
 ##Playing with weppy
 - open one of the idf files
 - click on CONSTRUCTION
@@ -38,4 +40,13 @@ python weppy.py
 You can try this with other objects
 
 that is all so far.
+
+##where do the idf files come from
+take a look at the file `idffilenames.txt`
+
+## where does the idd file come from
+It is hard coded in `eppystuff.py`. Change it if you need to.
+
+##Notes
+This was written in about 2-3 days. Does not seem to break so far. It was written to assist me in a presentation on E+.
 

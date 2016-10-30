@@ -19,11 +19,17 @@ def putfilenameontop(idf, lines):
 def hello():
     return "Hello World!"
 
+@route('/')
+def homepage():
+    return '<a href=idf>view idf files</a>'
+
 @route('/idf')
-def idftext():
+def idflist():
     idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
-    lines = idf.idfstr().splitlines()
+    urls = ["idf/%s" % (i, ) for i in range(len(idfs))]
+    lines = ['%s %s <a href=%s>%s</a>' % (i, abullet, url, idf.idfname)
+                    for i, (url, idf) in enumerate(zip(urls, idfs))]
+    lines.insert(0, "<h3>IDF files you can view</h3>")
     return '<br>'.join(lines)
 
 @route('/idf/<idfindex:int>')
@@ -197,7 +203,7 @@ def theidfobjectshowlinks(idfindex, keyindex, objindex):
                                                         refobjtxts)]
     lines.pop(0)
     lineswithtitle = [objkey, '='*len(objkey)] + lines
-    lineswithtitle = putfilenameontop(idf, lines2)
+    lineswithtitle = putfilenameontop(idf, lines)
     html = '<br>'.join(lineswithtitle)
     return html
 

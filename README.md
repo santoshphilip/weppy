@@ -1,19 +1,25 @@
 # weppy
 toy web interface for eppy
+
 You can view the files but cannot edit it yet.
+
 Shows some of the interconnections between the idf objects
 
 ## Installation
 clone weppy
-git clone https://github.com/santoshphilip/weppy.git
+
+git clone https://github.com/santoshphilip/weppy.git into a folder of your choice
 
 create a virtual environment
+
 pip install -r requirements.txt
 
 
 ##Running weppy
 cd to the folder where you cloned weppy
+
 run:
+
 python weppy.py
 
 ##Playing with weppy
@@ -30,5 +36,6 @@ python weppy.py
         - follow the new links
 
 You can try this with other objects
+
 that is all so far.
 

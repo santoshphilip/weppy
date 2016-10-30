@@ -1,0 +1,10 @@
+# make the list of filenames you want weppy to open here
+# each filename should be on a new line
+# use "/" in the pathname even if you are on a windows machine
+# (windows uses "\" in pathnames, but don't do that here)
+# any test after a "#" will be ignored as a comment
+
+./examplefiles/5ZoneReturnFan.idf
+./examplefiles/5ZoneAirCooled.idf
+./examplefiles/1ZoneUncontrolled_DDChanges.idf
+

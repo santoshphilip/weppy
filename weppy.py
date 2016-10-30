@@ -3,12 +3,17 @@ import eppystuff
 import eppy.idf_helpers as idf_helpers
 from eppy.bunch_subclass import EpBunch
 
-# idf = eppystuff.makeanidf()
 aspace = "&emsp;"
 abullet = "&bull;"
 def codetag(txt):
     """put code tags around the txt"""
     return "<code>%s<code>"  % (txt, )
+    
+def putfilenameontop(idf, lines):
+    """put the idf file name on top of page"""
+    openfile = '<%s>%s</%s>' % ('h4', idf.idfname, 'h4')
+    lines = [openfile, '<hr>'] + lines
+    return lines
 
 @route('/hello')
 def hello():
@@ -16,29 +21,36 @@ def hello():
 
 @route('/idf')
 def idftext():
-    idf = eppystuff.getidf()
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     lines = idf.idfstr().splitlines()
     return '<br>'.join(lines)
 
-@route('/idf/0')
-def idf():
-    idf = eppystuff.getidf()
+@route('/idf/<idfindex:int>')
+def idf(idfindex):
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     objnames = idf_helpers.idfobjectkeys(idf)
     allidfobjects = [idf.idfobjects[objname.upper()] for objname in objnames]
     numobjects = [len(idfobjects) for idfobjects in allidfobjects]
     objsnums = [(i, objname, num)
             for i, (objname, num) in enumerate(zip(objnames, numobjects))
             if num > 0]
-    urls = ["0/%s" % (i, ) for i, objname, num in objsnums]
+    urls = ["%s/%s" % (idfindex,i, ) for i, objname, num in objsnums]
     linktags = ['<a href=%s>%03d Items</a>' % (url, num, ) for (i, objname, num), url in zip(objsnums, urls)]
     lines = ["""%s -> id:%03d - %s""" % (linktag, i, objname) for (i, objname, num), linktag in zip(objsnums, linktags)]
+    # openfile = 'open file = %s' % (idf.idfname, )
+    # lines = [openfile, '<hr>'] + lines
+    lines = putfilenameontop(idf, lines)
     html = "<br>".join(lines)
     return html
     
-@route('/idf/0/<keyindex:int>')
-def theidfobjects(keyindex):
+@route('/idf/<idfindex:int>/<keyindex:int>')
+def theidfobjects(idfindex, keyindex):
     # try keyindex 84
-    idf = eppystuff.getidf()
+    print idfindex
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
     idfobjects = idf.idfobjects[objname]
@@ -46,6 +58,7 @@ def theidfobjects(keyindex):
     linklines = ['<a href="%s/%s">%s %s %s</a>' % (keyindex, i, i, abullet, line, ) for i, line in objnames]
     title = "ALL %sS" % (objname, )
     lines = [title, '='*len(title)] + linklines
+    lines = putfilenameontop(idf, lines)
     html = "<br>".join(lines)
     return html # codetag(html)
 
@@ -87,9 +100,10 @@ def funcsresults2lines(funcsresults):
     lines = ["%s = %s" % (func, value) for func, value in cleanfuncsresults]
     return lines
     
-def getreferingobjs(idfobject):
+def getreferingobjs(idfindex, idfobject):
     """return html of referingobjs"""
-    idf = eppystuff.getidf()
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     refobjs = idfobject.getreferingobjs() 
     keys = [refobj.key for refobj in refobjs]   
     objnames = [refobj.obj[1] for refobj in refobjs] 
@@ -103,9 +117,10 @@ def getreferingobjs(idfobject):
     lines = ["%s->%s" % (refobj.key, urllink) for refobj, urllink in zip(refobjs, urllinks)]
     return ', '.join(lines)
     
-def getmentioningobjs(idfobject):
+def getmentioningobjs(idfindex, idfobject):
     """return the html of mentioning objs"""
-    idf = eppystuff.getidf()
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     mentioningobjs = idf_helpers.getanymentions(idf, idfobject)
     keys = [mentioningobj.key for mentioningobj in mentioningobjs]   
     objnames = [mentioningobj.obj[1] for mentioningobj in mentioningobjs] 
@@ -119,10 +134,11 @@ def getmentioningobjs(idfobject):
     lines = ["%s->%s" % (mentioningobj.key, urllink) for mentioningobj, urllink in zip(mentioningobjs, urllinks)]
     return ', '.join(lines)
 
-@route('/idf/0/<keyindex:int>/<objindex:int>')
-def theidfobject(keyindex, objindex):
+@route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>')
+def theidfobject(idfindex, keyindex, objindex):
     # try keyindex 84
-    idf = eppystuff.getidf()
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
@@ -154,13 +170,15 @@ def theidfobject(keyindex, objindex):
     heading = '%s <a href=%s/key/iddinfo> %s</a>' % (objkey, objindex, '?')
     lineswithtitle = [heading, "=" * len(objkey)] + lines
     lineswithtitle.insert(0, showlinkslink)
+    lineswithtitle = putfilenameontop(idf, lineswithtitle)
     html = '<br>'.join(lineswithtitle)
     return html
 
-@route('/idf/0/<keyindex:int>/showlinks/<objindex:int>')
-def theidfobjectshowlinks(keyindex, objindex):
+@route('/idf/<idfindex:int>/<keyindex:int>/showlinks/<objindex:int>')
+def theidfobjectshowlinks(idfindex, keyindex, objindex):
     # try keyindex 84
-    idf = eppystuff.getidf()
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
@@ -179,12 +197,14 @@ def theidfobjectshowlinks(keyindex, objindex):
                                                         refobjtxts)]
     lines.pop(0)
     lineswithtitle = [objkey, '='*len(objkey)] + lines
+    lineswithtitle = putfilenameontop(idf, lines2)
     html = '<br>'.join(lineswithtitle)
     return html
 
-@route('/idf/0/<keyindex:int>/objfunctions/<objindex:int>')
-def theidfobjectobjfunctions(keyindex, objindex):
-    idf = eppystuff.getidf()
+@route('/idf/<idfindex:int>/<keyindex:int>/objfunctions/<objindex:int>')
+def theidfobjectobjfunctions(idfindex, keyindex, objindex):
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
@@ -202,12 +222,14 @@ def theidfobjectobjfunctions(keyindex, objindex):
     lineswithtitle = [objkey, '='*len(objkey)] + lines
     funcsresults = bunch__functions(idfobject)
     funclines = funcsresults2lines(funcsresults)
+    lineswithtitle = putfilenameontop(idf, lineswithtitle)
     html = '<br>'.join(lineswithtitle + ["<hr>", ] + funclines)
     return html
 
-@route('/idf/0/<keyindex:int>/refferingobjs/<objindex:int>')
-def theidfobjectrefferingobjs(keyindex, objindex):
-    idf = eppystuff.getidf()
+@route('/idf/<idfindex:int>/<keyindex:int>/refferingobjs/<objindex:int>')
+def theidfobjectrefferingobjs(idfindex, keyindex, objindex):
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
@@ -223,13 +245,15 @@ def theidfobjectrefferingobjs(keyindex, objindex):
     # ---
     lines.pop(0)
     lineswithtitle = [objkey, '='*len(objkey)] + lines
-    referingobjsline = getreferingobjs(idfobject)
+    referingobjsline = getreferingobjs(idfindex, idfobject)
+    lineswithtitle = putfilenameontop(idf, lineswithtitle)
     html = '<br>'.join(lineswithtitle + ["<hr>", ] + [referingobjsline, ])
     return html
 
-@route('/idf/0/<keyindex:int>/mentioningobjs/<objindex:int>')
-def theidfobjectmentioningobjs(keyindex, objindex):
-    idf = eppystuff.getidf()
+@route('/idf/<idfindex:int>/<keyindex:int>/mentioningobjs/<objindex:int>')
+def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
@@ -245,14 +269,15 @@ def theidfobjectmentioningobjs(keyindex, objindex):
     # ---
     lines.pop(0)
     lineswithtitle = [objkey, '='*len(objkey)] + lines
-    mentioningobjsline = getmentioningobjs(idfobject)
+    mentioningobjsline = getmentioningobjs(idfindex, idfobject)
     html = '<br>'.join(lineswithtitle + ["<hr>", ] + ['Mentioning Objects', mentioningobjsline, ])
     return html
 
-@route('/idf/0/<keyindex:int>/<objindex:int>/<field>')
-def theidfobjectfield(keyindex, objindex, field):
+@route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>/<field>')
+def theidfobjectfield(idfindex, keyindex, objindex, field):
     # try keyindex 84
-    idf = eppystuff.getidf()
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
     idfobjects = idf.idfobjects[objname]
@@ -261,10 +286,11 @@ def theidfobjectfield(keyindex, objindex, field):
     print html
     return codetag(html)
 
-@route('/idf/0/<keyindex:int>/<objindex:int>/<field>/iddinfo')
-def theiddinfo(keyindex, objindex, field):
+@route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>/<field>/iddinfo')
+def theiddinfo(idfindex, keyindex, objindex, field):
     # try keyindex 84
-    idf = eppystuff.getidf()
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
     idfobjects = idf.idfobjects[objname]
@@ -272,7 +298,9 @@ def theiddinfo(keyindex, objindex, field):
     iddinfo = idfobject.getfieldidd(field)
     lines = []
     for key, val in iddinfo.items():
-        if len(val) == 1:
+        if isinstance(val, set):
+            lines.append('%s = %s' % (key, val))
+        elif len(val) == 1:
             if val[0] == '':
                 lines.append('%s' % (key, ))
             else:

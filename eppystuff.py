@@ -8,6 +8,7 @@
 
 import StringIO
 from eppy.iddcurrent import iddcurrent
+import eppy.idf_helpers as idf_helpers
 from eppy.modeleditor import IDF
 from eppy.EPlusInterfaceFunctions.eplusdata import removecomment
 iddfile = './Energy+.idd'
@@ -24,11 +25,16 @@ fnames = getfnames()
 if IDF.getiddname() == None:
     IDF.setiddname(iddfile)
 idfs = [IDF(fname) for fname in fnames]
+nodekeys = idf_helpers.getidfkeyswithnodes()
 
 
 def getidf():
     """return an idf"""
     return idfs
+    
+def getnodekeys():
+    """return keys that have node fields"""
+    return nodekeys
     
 def objnames():
     """return obj names"""

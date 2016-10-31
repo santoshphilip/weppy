@@ -103,11 +103,14 @@ def epbunchlist2html(epbunchlist):
     
 def funcsresults2lines(funcsresults):
     """return lines of funcsresults"""
-    funcssimple = [(func, value) for func, value in funcsresults if not isinstance(value, list)]
-    funcslist = [(func, value) for func, value in funcsresults if isinstance(value, list)]
+    funcssimple = [(func, value) 
+        for func, value in funcsresults if not isinstance(value, list)]
+    funcslist = [(func, value) 
+        for func, value in funcsresults if isinstance(value, list)]
     funcsbunchlist = [(func, values) for func, values in funcslist if values]
     funcsbunchlist = [(func, epbunchlist2html(values)) 
-                for func, values in funcsbunchlist if isinstance(values[0], EpBunch)]
+                for func, values in funcsbunchlist 
+                    if isinstance(values[0], EpBunch)]
     cleanfuncsresults = funcssimple + funcsbunchlist
     lines = ["%s = %s" % (func, value) for func, value in cleanfuncsresults]
     return lines
@@ -125,8 +128,10 @@ def getreferingobjs(idfindex, idfobject):
                             for refobj  in refobjs] 
     urls = ["../../%s/%s" % (idfkey, objkey) 
                 for idfkey, objkey in keysobjsindexes]
-    urllinks = ['<a href=%s>%s</a>' % (url, name) for url, name in zip(urls, objnames)]
-    lines = ["%s->%s" % (refobj.key, urllink) for refobj, urllink in zip(refobjs, urllinks)]
+    urllinks = ['<a href=%s>%s</a>' % (url, name) 
+        for url, name in zip(urls, objnames)]
+    lines = ["%s->%s" % (refobj.key, urllink) 
+        for refobj, urllink in zip(refobjs, urllinks)]
     return ', '.join(lines)
     
 def getmentioningobjs(idfindex, idfobject):
@@ -138,12 +143,14 @@ def getmentioningobjs(idfindex, idfobject):
     objnames = [mentioningobj.obj[1] for mentioningobj in mentioningobjs] 
     idfkeys = idf_helpers.idfobjectkeys(idf)
     keysobjsindexes = [(idfkeys.index(mentioningobj.key.upper()), 
-                            idf.idfobjects[mentioningobj.key.upper()].index(mentioningobj))
+                idf.idfobjects[mentioningobj.key.upper()].index(mentioningobj))
                                 for mentioningobj  in mentioningobjs] 
     urls = ["../../%s/%s" % (idfkey, objkey) 
                 for idfkey, objkey in keysobjsindexes]
-    urllinks = ['<a href=%s>%s</a>' % (url, name) for url, name in zip(urls, objnames)]
-    lines = ["%s->%s" % (mentioningobj.key, urllink) for mentioningobj, urllink in zip(mentioningobjs, urllinks)]
+    urllinks = ['<a href=%s>%s</a>' % (url, name) 
+        for url, name in zip(urls, objnames)]
+    lines = ["%s->%s" % (mentioningobj.key, urllink) 
+        for mentioningobj, urllink in zip(mentioningobjs, urllinks)]
     return ', '.join(lines)
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>')
@@ -168,7 +175,9 @@ def theidfobject(idfindex, keyindex, objindex):
     # ---
     lines.pop(0)
     url = 'showlinks/%s' % (objindex, )
-    showlinkslink = '<a href=%s>show links to other objects</a> <hr>' % (url, )
+    showlinkslink = '<a href=%s>show links to other objects</a>' % (url, )
+    url = 'nodementions/%s' % (objindex, )
+    showmentionslink = '<a href=%s>show node connections</a> <hr>' % (url, )
     
     url = 'objfunctions/%s' % (objindex, )
     objfunctionslink = '<hr> <a href=%s>run functions of this object</a>' % (url, )
@@ -181,6 +190,7 @@ def theidfobject(idfindex, keyindex, objindex):
     lines.append(mentioningobjslink)
     heading = '%s <a href=%s/key/iddinfo> %s</a>' % (objkey, objindex, '?')
     lineswithtitle = [heading, "=" * len(objkey)] + lines
+    lineswithtitle.insert(0, showmentionslink)
     lineswithtitle.insert(0, showlinkslink)
     lineswithtitle = putfilenameontop(idf, lineswithtitle)
     html = '<br>'.join(lineswithtitle)
@@ -197,7 +207,15 @@ def theidfobjectshowlinks(idfindex, keyindex, objindex):
     idfobject = idfobjects[objindex]
     fields = idfobject.objls
     values = idfobject.obj
-    refobjs = [idfobject.get_referenced_object(fieldname) for fieldname in idfobject.objls]
+    refobjs = [idfobject.get_referenced_object(fieldname) 
+                        for fieldname in idfobject.objls]
+    # nrefobjs -> objects that are not referenced, so use the previous field
+    nrefobjs = [idf_helpers.getobject_use_prevfield(idf, idfobject, fieldname) 
+                        for fieldname in idfobject.fieldnames]
+    # merge nrefobjs inot refobjs
+    for i, (obj1, obj2) in enumerate(zip(refobjs, nrefobjs)):
+        if not obj1:
+            refobjs[i] = obj2
     valuesfields = [(value, field) for value, field in zip(values, fields)]
     urls = ["%s/%s" % (objindex, field) for field in fields]
     linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,) 
@@ -207,6 +225,64 @@ def theidfobjectshowlinks(idfindex, keyindex, objindex):
                 for linktag, field, refobjtxt in zip(linktags, 
                                                         fields, 
                                                         refobjtxts)]
+    lines.pop(0)
+    lineswithtitle = [objkey, '='*len(objkey)] + lines
+    lineswithtitle = putfilenameontop(idf, lines)
+    html = '<br>'.join(lineswithtitle)
+    return html
+    
+def makenodeobjtxts(idf, nodeobjlist):
+    """html of all the mentioned nodes"""
+    idfobjectkeys = idf_helpers.idfobjectkeys(idf)
+    nodeobjtxts = []
+    for nodeobjs in nodeobjlist:
+        if nodeobjs:
+            nodeobjtxtlist = []
+            for nodeobj in nodeobjs:
+                keyindex = idfobjectkeys.index(nodeobj.key.upper())
+                idfobjects = idf.idfobjects[nodeobj.key.upper()]
+                objindex = idfobjects.index(nodeobj)
+                url = "../%s/%s" % (keyindex, objindex)
+                nodeobjtxt = '%s->%s' % (nodeobj.key, nodeobj.Name)
+                linktag = '%s%s %s-><a href=../%s>%s</a>' % (aspace, 
+                                                abullet, 
+                                                nodeobj.key, 
+                                                url, nodeobj.Name)
+                nodeobjtxtlist.append(linktag)
+            nodeobjtxtlist.insert(0, "%s this node connects to:" % (abullet, ))
+            nodeobjtxtlist.insert(0, "")
+            sepr = "<br> %s " % (aspace, )
+            atxt = sepr.join([item for item in nodeobjtxtlist])
+            nodeobjtxts.append(str(atxt))
+        else:
+            nodeobjtxts.append("")
+    return nodeobjtxts
+        
+
+@route('/idf/<idfindex:int>/<keyindex:int>/nodementions/<objindex:int>')
+def theidfobjectnodementions(idfindex, keyindex, objindex):
+    idfs = eppystuff.getidf()
+    idf = idfs[idfindex]
+    objkeys = idf_helpers.idfobjectkeys(idf)
+    objkey = objkeys[keyindex]
+    idfobjects = idf.idfobjects[objkey]
+    idfobject = idfobjects[objindex]
+    fields = idfobject.objls
+    values = idfobject.obj
+    nodekeys = eppystuff.getnodekeys()
+    nodeobjs = []
+    for value, fieldname in zip(values, fields):
+        nodeobj = idf_helpers.getobjectswithnode(idf, nodekeys, value)
+        nodeobjs.append(nodeobj)
+    valuesfields = [(value, field) for value, field in zip(values, fields)]
+    urls = ["%s/%s" % (objindex, field) for field in fields]
+    linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,)
+                    for i, (url, value) in enumerate(zip(urls, values))]
+    nodeobjtxts = makenodeobjtxts(idf, nodeobjs)
+    lines = ["%s %s %s %s" % (linktag, aspace, field, refobjtxt) 
+                for linktag, field, refobjtxt in zip(linktags, 
+                                                        fields, 
+                                                        nodeobjtxts)]
     lines.pop(0)
     lineswithtitle = [objkey, '='*len(objkey)] + lines
     lineswithtitle = putfilenameontop(idf, lines)

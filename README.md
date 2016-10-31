@@ -36,6 +36,10 @@ open "http://localhost:8080" in your browser
         - go back
     - click on "Show objects that mention this object"
         - follow the new links
+    - go to PLANTLOOP
+        - click on one of the loops
+        - click on show node connections
+            - It will hsoe you what components this connected to.
 
 You can try this with other objects
 

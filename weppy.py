@@ -8,6 +8,7 @@ from bottle import route, run
 import eppystuff
 import eppy.idf_helpers as idf_helpers
 from eppy.bunch_subclass import EpBunch
+from docurls import getdoclink
 
 aspace = "&emsp;"
 abullet = "&bull;"
@@ -49,8 +50,13 @@ def idf(idfindex):
             for i, (objname, num) in enumerate(zip(objnames, numobjects))
             if num > 0]
     urls = ["%s/%s" % (idfindex,i, ) for i, objname, num in objsnums]
+    siteurl = "http://bigladdersoftware.com/epx/docs/8-3/input-output-reference/"
+    docurls = [getdoclink(objname.upper()) for i, objname, num in objsnums]
+    durltags = [' <a href=%s target="_blank">docs</a>' % (url, ) 
+                    for url in docurls]
     linktags = ['<a href=%s>%03d Items</a>' % (url, num, ) for (i, objname, num), url in zip(objsnums, urls)]
-    lines = ["""%s -> id:%03d - %s""" % (linktag, i, objname) for (i, objname, num), linktag in zip(objsnums, linktags)]
+    lines = ["""%s -> id:%03d - (%s) - %s""" % (linktag, i, durltag, objname) 
+            for (i, objname, num), linktag, durltag in zip(objsnums, linktags, durltags)]
     # openfile = 'open file = %s' % (idf.idfname, )
     # lines = [openfile, '<hr>'] + lines
     lines = putfilenameontop(idf, lines)
@@ -59,8 +65,6 @@ def idf(idfindex):
     
 @route('/idf/<idfindex:int>/<keyindex:int>')
 def theidfobjects(idfindex, keyindex):
-    # try keyindex 84
-    print idfindex
     idfs = eppystuff.getidf()
     idf = idfs[idfindex]
     objnames = idf_helpers.idfobjectkeys(idf)
@@ -68,8 +72,10 @@ def theidfobjects(idfindex, keyindex):
     idfobjects = idf.idfobjects[objname]
     objnames = [(i, str(idfobject.obj[1])) for i, idfobject in enumerate(idfobjects)]
     linklines = ['<a href="%s/%s">%s %s %s</a>' % (keyindex, i, i, abullet, line, ) for i, line in objnames]
-    title = "ALL %sS" % (objname, )
-    lines = [title, '='*len(title)] + linklines
+    titledoc = '<a href="%s" target="_blank">docs</a>' % (getdoclink(objname.upper()))
+    justtitle = "ALL %sS" % (objname, )
+    title = '%s (%s)' % (justtitle, titledoc)
+    lines = [title, '='*len(justtitle)] + linklines
     lines = putfilenameontop(idf, lines)
     html = "<br>".join(lines)
     return html # codetag(html)
@@ -155,7 +161,6 @@ def getmentioningobjs(idfindex, idfobject):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>')
 def theidfobject(idfindex, keyindex, objindex):
-    # try keyindex 84
     idfs = eppystuff.getidf()
     idf = idfs[idfindex]
     objkeys = idf_helpers.idfobjectkeys(idf)
@@ -189,7 +194,9 @@ def theidfobject(idfindex, keyindex, objindex):
     mentioningobjslink = '<a href=%s>Show objects that mention this object</a>' % (url, )
     lines.append(mentioningobjslink)
     heading = '%s <a href=%s/key/iddinfo> %s</a>' % (objkey, objindex, '?')
-    lineswithtitle = [heading, "=" * len(objkey)] + lines
+    headingdoc = '<a href="%s" target="_blank">docs</a>' % (getdoclink(objkey.upper()))
+    headingwithdoc = '%s (%s)' % (heading, headingdoc)
+    lineswithtitle = [headingwithdoc, "=" * len(objkey)] + lines
     lineswithtitle.insert(0, showmentionslink)
     lineswithtitle.insert(0, showlinkslink)
     lineswithtitle = putfilenameontop(idf, lineswithtitle)
@@ -198,7 +205,6 @@ def theidfobject(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/showlinks/<objindex:int>')
 def theidfobjectshowlinks(idfindex, keyindex, objindex):
-    # try keyindex 84
     idfs = eppystuff.getidf()
     idf = idfs[idfindex]
     objkeys = idf_helpers.idfobjectkeys(idf)
@@ -363,7 +369,6 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>/<field>')
 def theidfobjectfield(idfindex, keyindex, objindex, field):
-    # try keyindex 84
     idfs = eppystuff.getidf()
     idf = idfs[idfindex]
     objnames = idf_helpers.idfobjectkeys(idf)
@@ -376,7 +381,6 @@ def theidfobjectfield(idfindex, keyindex, objindex, field):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>/<field>/iddinfo')
 def theiddinfo(idfindex, keyindex, objindex, field):
-    # try keyindex 84
     idfs = eppystuff.getidf()
     idf = idfs[idfindex]
     objnames = idf_helpers.idfobjectkeys(idf)

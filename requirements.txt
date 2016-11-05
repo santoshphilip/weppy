@@ -1,3 +1,5 @@
 setuptools>=20
 https://github.com/santoshphilip/eppy/archive/weppy.zip
 bottle
+beautifulsoup4
+requests

@@ -31,6 +31,7 @@ open "http://localhost:8080" in your browser
 - click on CONSTRUCTION
 - click on one of the constructions
     - click on the "?"
+    - click on "docs"
     - click on "show links to other objects"
         - follow the new links
         - go back
@@ -41,7 +42,7 @@ open "http://localhost:8080" in your browser
     - go to PLANTLOOP
         - click on one of the loops
         - click on "show node connections"
-            - It will hsoe you what components this connected to.
+            - It will show you what components this connected to.
 
 You can try this with other objects
 

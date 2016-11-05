@@ -52,3 +52,7 @@ stage5
 stage6
 ------
 - fully functional - no broken links
+
+stage7
+------
+- added documentation links

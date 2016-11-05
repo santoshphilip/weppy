@@ -48,3 +48,7 @@ stage4
 stage5
 ------
 - will show node connections
+
+stage6
+------
+- fully functional - no broken links

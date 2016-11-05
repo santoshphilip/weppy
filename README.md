@@ -14,6 +14,8 @@ create a virtual environment
 
 pip install -r requirements.txt
 
+Note: weppy uses a modified version of eppy. If you already have eppy installed, unistall it by doing `pip uninstall eppy` then do `pip install -r requirements.txt`
+
 
 ## Running weppy
 cd to the folder where you cloned weppy

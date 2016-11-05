@@ -217,7 +217,7 @@ def theidfobjectshowlinks(idfindex, keyindex, objindex):
         if not obj1:
             refobjs[i] = obj2
     valuesfields = [(value, field) for value, field in zip(values, fields)]
-    urls = ["%s/%s" % (objindex, field) for field in fields]
+    urls = ["../%s/%s" % (objindex, field) for field in fields]
     linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,) 
                     for i, (url, value) in enumerate(zip(urls, values))]
     refobjtxts = [refobjlink(idf, refobj) for refobj in refobjs]
@@ -275,7 +275,7 @@ def theidfobjectnodementions(idfindex, keyindex, objindex):
         nodeobj = idf_helpers.getobjectswithnode(idf, nodekeys, value)
         nodeobjs.append(nodeobj)
     valuesfields = [(value, field) for value, field in zip(values, fields)]
-    urls = ["%s/%s" % (objindex, field) for field in fields]
+    urls = ["../%s/%s" % (objindex, field) for field in fields]
     linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,)
                     for i, (url, value) in enumerate(zip(urls, values))]
     nodeobjtxts = makenodeobjtxts(idf, nodeobjs)

@@ -11,6 +11,7 @@ from eppy.iddcurrent import iddcurrent
 import eppy.idf_helpers as idf_helpers
 from eppy.modeleditor import IDF
 from eppy.EPlusInterfaceFunctions.eplusdata import removecomment
+from eppy.useful_scripts import loopdiagram
 iddfile = './Energy+.idd'
 
 def getfnames(fnametxt='./idffilenames.txt'):
@@ -25,12 +26,26 @@ fnames = getfnames()
 if IDF.getiddname() == None:
     IDF.setiddname(iddfile)
 idfs = [IDF(fname) for fname in fnames]
+alledges = [loopdiagram.getedges(idf.idfname, iddfile) for idf in idfs]
 nodekeys = idf_helpers.getidfkeyswithnodes()
 
 
-def getidf():
+def getidfs():
     """return an idf"""
     return idfs
+    
+def getalledges():
+    """return edges"""
+    return alledges
+    
+def idfsandedges():
+    """return idfs and edges"""
+    return idfs, alledges
+    
+def an_idfedges(index):
+    """return a specific idf and it's edges"""
+    idfs, alledges = idfsandedges()
+    return idfs[index], alledges[index]
     
 def getnodekeys():
     """return keys that have node fields"""

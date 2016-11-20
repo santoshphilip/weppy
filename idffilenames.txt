@@ -5,6 +5,6 @@
 # any test after a "#" will be ignored as a comment
 
 ./examplefiles/5ZoneReturnFan.idf
-./examplefiles/5ZoneAirCooled.idf
-./examplefiles/1ZoneUncontrolled_DDChanges.idf
-
+# ./examplefiles/5ZoneAirCooled.idf
+# ./examplefiles/1ZoneUncontrolled_DDChanges.idf
+# /Users/santoshphilip/Dropbox/coolshadow/smithgroup/working/base28.idf

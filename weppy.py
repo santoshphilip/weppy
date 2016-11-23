@@ -370,7 +370,7 @@ def theidfobjectfield(idfindex, keyindex, objindex, field):
     idfobjects = idf.idfobjects[objname]
     idfobject = idfobjects[objindex]
     html = "%s <- %s . <i>Editable in the future</i>"  % (idfobject[field], field)
-    print html
+    # print html
     return codetag(html)
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>/<field>/iddinfo')
@@ -403,7 +403,6 @@ def theiddinfo(idfindex, keyindex, objindex, field):
 def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     """hvac previous and next object"""
     idf, edges = eppystuff.an_idfedges(idfindex)
-    print edges
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
     idfobjects = idf.idfobjects[objname]
@@ -412,8 +411,8 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     nextnodes = walk_hvac.nextnode(edges, idfobject.Name)
     # lastnode = 'sb4_pipe'
     # prevnodes = walk_hvac.prevnode(edges, lastnode)
-    
-    return str(nextnodes)
+    html = '<br>'.join(nextnodes)
+    return html
     
     
 run(host='localhost', port=8080, debug=True)

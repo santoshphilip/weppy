@@ -469,20 +469,29 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     ]
     betweenlines = ["", "Previous Objects"]
     prevnodes = walk_hvac.prevnode(edges, idfobject.Name)
-    print prevnodes
     prevobjs = [idf_helpers.name2idfobject(idf, pnode) for pnode in prevnodes]
     keyobjids = [eppystuff.idfobjectindices(idf, nobj) for nobj in prevobjs]
-    purls = ["../../%s/%s" % (key_id, obj_id) for key_id, obj_id in keyobjids]
+    try:
+        purls = ["../../%s/%s" % (key_id, obj_id) 
+                    for key_id, obj_id in keyobjids]
+    except TypeError as e:
+        purls = []
     prevlinks = ['<a href=%s>%s</a>' % (url, pnode)
                     for pnode, url in zip(prevnodes, purls)]
-    html = '<br>'.join(firstlines + nextlinks + betweenlines + prevlinks)
+    # image snippet
+    onlythis = [idfobject.Name, ] + nextnodes + prevnodes
+    trimmed = eppystuff.trimedges(edges, onlythis)
+    from eppy.useful_scripts import loopdiagram
+    loopdiagram.save_diagram('a', loopdiagram.makediagram(trimmed))
+    imgline = ['<img src="../../../../../a.png" alt="snippet">']
+    html = '<br>'.join(firstlines + nextlinks + betweenlines + prevlinks + imgline)
     return html
     
     
 run(host='localhost', port=8080, debug=True)
 
 try:
-    run(host='0.0.0.0', port=argv[1])
+    run(host='0.0.0.0', port=argv[1]) # to run on heroku
 except IndexError as e:
-    run(host='localhost', port=8080, debug=True)
+    run(host='localhost', port=8080, debug=True) # runs locally
 

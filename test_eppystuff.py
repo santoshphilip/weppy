@@ -29,3 +29,36 @@ def test_idfobjectindices():
             idfobj = idf.newidfobject(objkey.upper(), Name="obj%s" % (i, ))
         result = eppystuff.idfobjectindices(idf, idfobj)
         assert result == (key_id, obj_id)
+        
+def test_trimedges():
+    """py.test trimedges"""
+    data = (
+    (
+        [('a', 'b'), ('c', 'd')],
+        None,
+        [('a', 'b'), ('c', 'd')],        
+    ), # edges, onlythis, expected
+    (
+        [('a', 'b'), ('c', 'd')],
+        ('a'),
+        [('a', 'b')],        
+    ), # edges, onlythis, expected
+    (
+        [('a', 'b'), ('c', 'd')],
+        ('a', 'b'),
+        [('a', 'b')],        
+    ), # edges, onlythis, expected
+    (
+        [('a', 'b'), ('c', 'd')],
+        ('f',),
+        [],       
+    ), # edges, onlythis, expected
+    (
+        [('a', 'b'), ('c', 'd')],
+        ('a', 'd'),
+        [('a', 'b'), ('c', 'd')],       
+    ), # edges, onlythis, expected
+    )        
+    for edges, onlythis, expected in data:
+        result = eppystuff.trimedges(edges, onlythis)
+        assert result == expected

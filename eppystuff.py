@@ -64,8 +64,22 @@ def page2():
 
 def idfobjectindices(idf, idfobj):
     """return indices to construct the url for weppy"""
-    objkey = idfobj.key
+    try:
+        objkey = idfobj.key
+    except AttributeError as e:
+        return None
     key_id = idf_helpers.idfobjectkeys(idf).index(objkey.upper())
     idfobjs = idf.idfobjects[objkey.upper()]
     obj_id = idfobjs.index(idfobj)
     return key_id, obj_id
+    
+def trimedges(edges, onlythis=None):
+    """trim the edges with onlythis"""
+    if not onlythis:
+        return edges
+    trimmed = []    
+    for item in edges:
+        a, b = item
+        if a in onlythis or b in onlythis:
+            trimmed.append(item)
+    return trimmed

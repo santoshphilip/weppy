@@ -4,6 +4,8 @@
 #  (See accompanying file LICENSE or copy at
 #  http://opensource.org/licenses/MIT)
 # =======================================================================
+from sys import argv
+
 from bottle import route, run
 import eppystuff
 import eppy.idf_helpers as idf_helpers
@@ -470,4 +472,9 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     
     
 run(host='localhost', port=8080, debug=True)
+
+try:
+    run(host='0.0.0.0', port=argv[1])
+except IndexError as e:
+    run(host='localhost', port=8080, debug=True)
 

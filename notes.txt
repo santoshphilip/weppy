@@ -1,19 +1,6 @@
-2016-11-15
+2016-11-23
 ----------
-further steps on how loops work
-- nodes connect to nodes
-    - except where connectors are involved.
-So:
-- loops have connectors
-- connectors are:
-    - mixers
-    - splitter
-- connectors work like this:
-    - branch0 -> splitter -> (branch1, branch2, branch3)
-    - (branch4, branch5, branch6) -> mixer -> branch7
-- branch works like this:
-    - node->component->node->component->node 
-    
+git push heroku mybranch:master
 2016-10-30
 ----------
 You may want to link to the html documentations too. - DONE

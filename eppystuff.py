@@ -63,3 +63,10 @@ def page2():
     return nlen
 
 
+def idfobjectindices(idf, idfobj):
+    """return indices to construct the url for weppy"""
+    objkey = idfobj.key
+    key_id = idf_helpers.idfobjectkeys(idf).index(objkey.upper())
+    idfobjs = idf.idfobjects[objkey.upper()]
+    obj_id = idfobjs.index(idfobj)
+    return key_id, obj_id

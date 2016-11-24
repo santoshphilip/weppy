@@ -30,7 +30,15 @@ def hello():
 
 @route('/')
 def homepage():
-    return '<a href=idf>view idf files</a>'
+    line1 = '<a href=readme>Readme</a>' 
+    line2 = '<a href=idf>view idf files</a>' 
+    lines = [line1] + [line2]
+    return '<BR>'.join(lines)
+
+@route('/readme')
+def readmepage():
+    import readme
+    return readme.txt
 
 @route('/idf')
 def idflist():

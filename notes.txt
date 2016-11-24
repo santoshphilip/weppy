@@ -1,5 +1,9 @@
 2016-11-23
 ----------
+http://daringfireball.net/projects/markdown/dingus
+for converions to html
+2016-11-23
+----------
 git push heroku mybranch:master
 2016-10-30
 ----------

@@ -62,7 +62,6 @@ def page2():
     nlen = [(name, ln)for name, ln in n_len if ln > 0]
     return nlen
 
-
 def idfobjectindices(idf, idfobj):
     """return indices to construct the url for weppy"""
     objkey = idfobj.key

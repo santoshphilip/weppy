@@ -58,10 +58,48 @@ def idf(idfindex):
             for (i, objname, num), linktag, durltag in zip(objsnums, linktags, durltags)]
     # openfile = 'open file = %s' % (idf.idfname, )
     # lines = [openfile, '<hr>'] + lines
+    url = "show_all/%s" % (idfindex, )
+    showmore = '<a href=%s>show more</a>' % (url, )
+    lines = [showmore, ""] + lines
     lines = putfilenameontop(idf, lines)
     html = "<br>".join(lines)
     return html
     
+@route('/idf/show_all/<idfindex:int>')
+def idf_all(idfindex):
+    idf, edges = eppystuff.an_idfedges(idfindex)
+    objnames = idf_helpers.idfobjectkeys(idf)
+    allidfobjects = [idf.idfobjects[objname.upper()] for objname in objnames]
+    numobjects = [len(idfobjects) for idfobjects in allidfobjects]
+    objsnums = [(i, objname, num)
+            for i, (objname, num) in enumerate(zip(objnames, numobjects))
+            if num >= 0]
+    urls = ["../%s/%s" % (idfindex,i, ) for i, objname, num in objsnums]
+    siteurl = "http://bigladdersoftware.com/epx/docs/8-3/input-output-reference/"
+    docurls = [getdoclink(objname.upper()) for i, objname, num in objsnums]
+    durltags = [' <a href=%s target="_blank">docs</a>' % (url, ) 
+                    for url in docurls]
+    linktags = []
+    for (i, objname, num), url in zip(objsnums, urls):
+        if num:
+            linktag = '<a href=%s>%03d Items</a>' % (url, num, )
+        else:
+            linktag = '%03d Items' % (num, )
+            linktag = '_' * (len(linktag)-1)
+        linktags.append(linktag)
+    # linktags = ['<a href=%s>%03d Items</a>' % (url, num, ) for (i, objname,num), url in zip(objsnums, urls)]
+    lines = ["""%s -> id:%03d - (%s) - %s""" % (linktag, i, durltag, objname) 
+            for (i, objname, num), linktag, durltag in zip(objsnums, linktags, durltags)]
+    # openfile = 'open file = %s' % (idf.idfname, )
+    # lines = [openfile, '<hr>'] + lines
+    url = "../%s" % (idfindex, )
+    showless = '<a href=%s>show less</a>' % (url, )
+    print url, showless
+    lines = [showless, ""] + lines
+    lines = putfilenameontop(idf, lines)
+    html = "<br>".join(lines)
+    return html
+
 @route('/idf/<idfindex:int>/<keyindex:int>')
 def theidfobjects(idfindex, keyindex):
     idf, edges = eppystuff.an_idfedges(idfindex)
@@ -190,7 +228,7 @@ def theidfobject(idfindex, keyindex, objindex):
     lines.append(mentioningobjslink)
     # - hvac links
     url = 'hvacprevnext/%s' % (objindex, )
-    hvacprevnextlink = 'HVAC object in loop -> <a href=%s>prev objects & next objects</a>' % (url, )
+    hvacprevnextlink = 'HVAC object in loop -> <a href=%s>prev objects & next objects</a> (broken at zone level :-(' % (url, )
     lines.append(hvacprevnextlink)
     # - 
     heading = '%s <a href=%s/key/iddinfo> %s</a>' % (objkey, objindex, '?')
@@ -409,9 +447,25 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     idfobject = idfobjects[objindex]
     from eppy import walk_hvac
     nextnodes = walk_hvac.nextnode(edges, idfobject.Name)
-    # lastnode = 'sb4_pipe'
-    # prevnodes = walk_hvac.prevnode(edges, lastnode)
-    html = '<br>'.join(nextnodes)
+    nextobjs = [idf_helpers.name2idfobject(idf, nnode) for nnode in nextnodes]
+    keyobjids = [eppystuff.idfobjectindices(idf, nobj) for nobj in nextobjs]
+    nurls = ["../../%s/%s" % (key_id, obj_id) for key_id, obj_id in keyobjids]
+    nextlinks = ['<a href=%s>%s</a>' % (url, nnode)
+                    for nnode, url in zip(nextnodes, nurls)]
+    firstlines = [
+    "HVAC connections from %s named '%s'" % (objname, idfobject.Name),
+    "",
+    "Next Objects",
+    ]
+    betweenlines = ["", "Previous Objects"]
+    prevnodes = walk_hvac.prevnode(edges, idfobject.Name)
+    print prevnodes
+    prevobjs = [idf_helpers.name2idfobject(idf, pnode) for pnode in prevnodes]
+    keyobjids = [eppystuff.idfobjectindices(idf, nobj) for nobj in prevobjs]
+    purls = ["../../%s/%s" % (key_id, obj_id) for key_id, obj_id in keyobjids]
+    prevlinks = ['<a href=%s>%s</a>' % (url, pnode)
+                    for pnode, url in zip(prevnodes, purls)]
+    html = '<br>'.join(firstlines + nextlinks + betweenlines + prevlinks)
     return html
     
     

@@ -3,6 +3,10 @@
 to make sure loopdaigem works on heroku
 heroku buildpacks:set https://github.com/weibeld/heroku-buildpack-graphviz.git
 git push heroku master
+
+to uninstall
+# heroku config:unset https://github.com/weibeld/heroku-buildpack-graphviz.git
+heroku buildpacks:remove https://github.com/weibeld/heroku-buildpack-graphviz.git
 2016-11-25
 ----------
 TODO :

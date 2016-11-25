@@ -1,9 +1,10 @@
 # weppy
-toy web interface for eppy
+toy web viewer for eppy
 
 You can view the files but cannot edit it yet.
 
 Shows some of the interconnections between the idf objects
+
 
 ## Installation
 clone weppy
@@ -27,7 +28,7 @@ python weppy.py
 open "http://localhost:8080" in your browser
 
 ## Playing with weppy
-- open one of the idf files
+- open one of the idf files (5ZoneReturnFan.idf is a good one)
 - click on CONSTRUCTION
 - click on one of the constructions
     - click on the "?"
@@ -39,10 +40,14 @@ open "http://localhost:8080" in your browser
         - go back
     - click on "Show objects that mention this object"
         - follow the new links
-    - go to PLANTLOOP
-        - click on one of the loops
-        - click on "show node connections"
-            - It will show you what components this connected to.
+- go to PLANTLOOP
+    - click on one of the loops
+    - click on "show node connections"
+        - It will show you what components this connected to.
+- go to CHILLER:ELECTRICS
+    - click on "Central Chiller"
+    - at the bottom of that page click on "prev objects & next objects"
+        - will show you a list of objects the chiller is connected to with a diagram of the connection
 
 You can try this with other objects
 
@@ -55,5 +60,11 @@ take a look at the file `idffilenames.txt`
 It is hard coded in `eppystuff.py`. Change it if you need to.
 
 ## Notes
-This was written in about 2-3 days. Does not seem to break so far. It was written to assist me in a presentation on E+.
+- Weppy was initially written in about 2-3 days. It was written to assist in a presentation on E+.
+- Now it has become a useful tool to understand how E+ builds it's HVAC.
+- This understanding is being used to further develop functions in eppy
+- Apart from this, weppy is showing potential for being a good viewer for E+.
+- You are welcome to fork it and build such a viewer.
+    - the eppy team may be motivated to write functions that will assist you in this.
+- Any comments or ideas for further development can be posted as an issue (or as a comment in an issue) in github-weppy
 

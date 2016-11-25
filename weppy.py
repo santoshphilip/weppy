@@ -11,7 +11,8 @@ from bottle import static_file
 import eppystuff
 import eppy.idf_helpers as idf_helpers
 from eppy.bunch_subclass import EpBunch
-from docurls import getdoclink
+import documentationurls
+from documentationurls import getdoclink
 IMGFOLDER = "temporary_images"
 
 aspace = "&emsp;"
@@ -67,7 +68,7 @@ def idf(idfindex):
             for i, (objname, num) in enumerate(zip(objnames, numobjects))
             if num > 0]
     urls = ["%s/%s" % (idfindex,i, ) for i, objname, num in objsnums]
-    siteurl = "http://bigladdersoftware.com/epx/docs/8-3/input-output-reference/"
+    # siteurl ="http://bigladdersoftware.com/epx/docs/8-3/input-output-reference/"
     docurls = [getdoclink(objname.upper()) for i, objname, num in objsnums]
     durltags = [' <a href=%s target="_blank">docs</a>' % (url, ) 
                     for url in docurls]
@@ -93,7 +94,7 @@ def idf_all(idfindex):
             for i, (objname, num) in enumerate(zip(objnames, numobjects))
             if num >= 0]
     urls = ["../%s/%s" % (idfindex,i, ) for i, objname, num in objsnums]
-    siteurl = "http://bigladdersoftware.com/epx/docs/8-3/input-output-reference/"
+    # siteurl ="http://bigladdersoftware.com/epx/docs/8-3/input-output-reference/"
     docurls = [getdoclink(objname.upper()) for i, objname, num in objsnums]
     durltags = [' <a href=%s target="_blank">docs</a>' % (url, ) 
                     for url in docurls]
@@ -425,7 +426,6 @@ def theidfobjectfield(idfindex, keyindex, objindex, field):
     idfobjects = idf.idfobjects[objname]
     idfobject = idfobjects[objindex]
     html = "%s <- %s . <i>Editable in the future</i>"  % (idfobject[field], field)
-    # print html
     return codetag(html)
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>/<field>/iddinfo')

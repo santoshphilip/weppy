@@ -1,6 +1,6 @@
 txt = """<h1>weppy</h1>
 
-<p>toy web interface for eppy</p>
+<p>toy web viewer for eppy</p>
 
 <p>You can view the files but cannot edit it yet.</p>
 
@@ -31,7 +31,7 @@ txt = """<h1>weppy</h1>
 <h2>Playing with weppy</h2>
 
 <ul>
-<li>open one of the idf files</li>
+<li>open one of the idf files (5ZoneReturnFan.idf is a good one)</li>
 <li>click on CONSTRUCTION</li>
 <li>click on one of the constructions
 <ul><li>click on the "?"</li>
@@ -42,11 +42,15 @@ txt = """<h1>weppy</h1>
 <li>click on "run functions of this object"
 <ul><li>go back</li></ul></li>
 <li>click on "Show objects that mention this object"
-<ul><li>follow the new links</li></ul></li>
+<ul><li>follow the new links</li></ul></li></ul></li>
 <li>go to PLANTLOOP
 <ul><li>click on one of the loops</li>
 <li>click on "show node connections"
-<ul><li>It will show you what components this connected to.</li></ul></li></ul></li></ul></li>
+<ul><li>It will show you what components this connected to.</li></ul></li></ul></li>
+<li>go to CHILLER:ELECTRICS
+<ul><li>click on "Central Chiller"</li>
+<li>at the bottom of that page click on "prev objects &amp; next objects"
+<ul><li>will show you a list of objects the chiller is connected to with a diagram of the connection</li></ul></li></ul></li>
 </ul>
 
 <p>You can try this with other objects</p>
@@ -63,6 +67,14 @@ txt = """<h1>weppy</h1>
 
 <h2>Notes</h2>
 
-<p>This was written in about 2-3 days. Does not seem to break so far. It was written to assist me in a presentation on E+.</p>
+<ul>
+<li>Weppy was initially written in about 2-3 days. It was written to assist in a presentation on E+.</li>
+<li>Now it has become a useful tool to understand how E+ builds it's HVAC.</li>
+<li>This understanding is being used to further develop functions in <a href="https://github.com/santoshphilip/eppy">eppy</a></li>
+<li>Apart from this, weppy is showing potential for being a good viewer for E+.</li>
+<li>You are welcome to fork it and build such a viewer.
+<ul><li>the eppy team may be motivated to write functions that will assist you in this.</li></ul></li>
+<li>Any comments or ideas for further development can be posted as an issue (or as a comment in an issue) in <a href="https://github.com/santoshphilip/weppy/issues">weppy</a></li>
+</ul>
 
 """

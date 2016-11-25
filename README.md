@@ -62,9 +62,9 @@ It is hard coded in `eppystuff.py`. Change it if you need to.
 ## Notes
 - Weppy was initially written in about 2-3 days. It was written to assist in a presentation on E+.
 - Now it has become a useful tool to understand how E+ builds it's HVAC.
-- This understanding is being used to further develop functions in eppy
+- This understanding is being used to further develop functions in [eppy](https://github.com/santoshphilip/eppy)
 - Apart from this, weppy is showing potential for being a good viewer for E+.
 - You are welcome to fork it and build such a viewer.
     - the eppy team may be motivated to write functions that will assist you in this.
-- Any comments or ideas for further development can be posted as an issue (or as a comment in an issue) in github-weppy
+- Any comments or ideas for further development can be posted as an issue (or as a comment in an issue) in [weppy](https://github.com/santoshphilip/weppy/issues)
 

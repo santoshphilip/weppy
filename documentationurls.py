@@ -41,4 +41,5 @@ def getdoclink(key):
     except KeyError as e:
         return None
 
-doclinks = getdoclinks(getdocsoup())
+# doclinks = getdoclinks(getdocsoup())
+doclinks = dict()

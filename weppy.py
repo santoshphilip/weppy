@@ -496,8 +496,6 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     return html
     
     
-run(host='localhost', port=8080, debug=True)
-
 try:
     run(host='0.0.0.0', port=argv[1]) # to run on heroku
 except IndexError as e:

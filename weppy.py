@@ -7,10 +7,12 @@
 from sys import argv
 
 from bottle import route, run
+from bottle import static_file
 import eppystuff
 import eppy.idf_helpers as idf_helpers
 from eppy.bunch_subclass import EpBunch
 from docurls import getdoclink
+IMGFOLDER = "temporary_images"
 
 aspace = "&emsp;"
 abullet = "&bull;"
@@ -28,10 +30,16 @@ def putfilenameontop(idf, lines):
 def hello():
     return "Hello World!"
 
+@route('/static/<filepath:path>')
+def server_static(filepath):
+    imgpath = static_file(filepath, root='./%s' % (IMGFOLDER, ))
+    return imgpath
+
 @route('/')
 def homepage():
     line1 = '<a href=readme>Readme</a>' 
     line2 = '<a href=idf>view idf files</a>' 
+    line3 = '<img src="/static/a.png">'
     lines = [line1] + [line2]
     return '<BR>'.join(lines)
 
@@ -104,7 +112,6 @@ def idf_all(idfindex):
     # lines = [openfile, '<hr>'] + lines
     url = "../%s" % (idfindex, )
     showless = '<a href=%s>show less</a>' % (url, )
-    print url, showless
     lines = [showless, ""] + lines
     lines = putfilenameontop(idf, lines)
     html = "<br>".join(lines)
@@ -482,8 +489,9 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     onlythis = [idfobject.Name, ] + nextnodes + prevnodes
     trimmed = eppystuff.trimedges(edges, onlythis)
     from eppy.useful_scripts import loopdiagram
-    loopdiagram.save_diagram('a', loopdiagram.makediagram(trimmed))
-    imgline = ['<img src="../../../../../a.png" alt="snippet">']
+    imgname = '%s_%s_%s' % (idfindex, keyindex, objindex)
+    eppystuff.save_imagesnippets(IMGFOLDER,imgname, trimmed)
+    imgline = ['<img src="../../../../../static/%s.png" alt="snippet">' % (imgname, )]
     html = '<br>'.join(firstlines + nextlinks + betweenlines + prevlinks + imgline)
     return html
     

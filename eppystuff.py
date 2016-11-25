@@ -6,6 +6,8 @@
 # =======================================================================
 """just eppy stuff"""
 
+import os
+
 import StringIO
 from eppy.iddcurrent import iddcurrent
 import eppy.idf_helpers as idf_helpers
@@ -83,3 +85,17 @@ def trimedges(edges, onlythis=None):
         if a in onlythis or b in onlythis:
             trimmed.append(item)
     return trimmed
+    
+def save_imagesnippets(imgfolder, imgname, trimmed):
+    """save images if they do not exist"""
+    imgpath = '%s/%s' % (imgfolder, imgname, )
+    print imgpath
+    if os.path.exists('%s.png' % (imgpath, )):
+        print "image exists"
+        return True
+    if not os.path.exists(imgfolder):
+        os.mkdir(imgfolder)
+    loopdiagram.save_diagram(imgpath, loopdiagram.makediagram(trimmed))
+    
+    
+        

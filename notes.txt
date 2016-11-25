@@ -1,3 +1,12 @@
+2016-11-25
+----------
+TODO :
+- update the README.md, readme.py, 
+- deploy to heroku    
+- move the snippet generation functions to eppy
+- revisit the loop builded on the zone end
+- look for missing elements in the loopdiagram
+    - you can do this by checking for snippets in weppy
 2016-11-23
 ----------
 http://daringfireball.net/projects/markdown/dingus

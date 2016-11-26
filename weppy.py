@@ -464,7 +464,7 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     idfobject = idfobjects[objindex]
     from eppy import walk_hvac
     nextnodes = walk_hvac.nextnode(edges, idfobject.Name)
-    nextobjs = [idf_helpers.name2idfobject(idf, nnode) for nnode in nextnodes]
+    nextobjs = [idf_helpers.name2idfobject(idf, Name=nnode) for nnode in nextnodes]
     keyobjids = [eppystuff.idfobjectindices(idf, nobj) for nobj in nextobjs]
     nurls = ["../../%s/%s" % (key_id, obj_id) for key_id, obj_id in keyobjids]
     nextlinks = ['<a href=%s>%s</a>' % (url, nnode)
@@ -476,7 +476,7 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     ]
     betweenlines = ["", "Previous Objects"]
     prevnodes = walk_hvac.prevnode(edges, idfobject.Name)
-    prevobjs = [idf_helpers.name2idfobject(idf, pnode) for pnode in prevnodes]
+    prevobjs = [idf_helpers.name2idfobject(idf, Name=pnode) for pnode in prevnodes]
     keyobjids = [eppystuff.idfobjectindices(idf, nobj) for nobj in prevobjs]
     try:
         purls = ["../../%s/%s" % (key_id, obj_id) 

@@ -5,4 +5,18 @@ Release email on E+ yahoo groups
 
 Experimental E+ viewer.
 
+You can see it at https://weppy.herokuapp.com:
+- Take a look at the Readme.
+- Then you can browse the files
+
 This is an experimental E+ viewer. You can download and deploy it locally and view your files. 
+
+It is not quite ready for prime time yet. But worth playing around with.
+
+Any comments or ideas can be posted at -
+https://github.com/santoshphilip/weppy/issues
+
+
+Santosh
+
+

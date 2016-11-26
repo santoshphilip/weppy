@@ -1,3 +1,8 @@
+2016-11-26
+----------
+- in the walk_hvac - code it so that it walks to
+    - ZoneHVAC:EquipmentConnections.Zone_Name rather than Zone.Name
+- put online url access in eppy. Also have local storage for the links
 2016-11-25
 ----------
 heroku buildpacks:add --index 1 heroku/python

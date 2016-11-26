@@ -98,4 +98,13 @@ def save_imagesnippets(imgfolder, imgname, trimmed):
     loopdiagram.save_diagram(imgpath, loopdiagram.makediagram(trimmed))
     
     
-        
+# idf_helpers.name2idfobject(idf, Name=nnode)
+def hvacname2idfobj(idf, aname):
+    """return the idf object given it's name
+    does initial check on 'ZoneHVAC:EquipmentConnections.Zone_name'"""
+    equipconnections = idf_helpers.name2idfobject(idf, 
+        objkeys=['ZoneHVAC:EquipmentConnections'.upper(), ],
+        Zone_Name=aname)
+    if equipconnections:
+        return equipconnections
+    return idf_helpers.name2idfobject(idf, Name=aname)

@@ -62,3 +62,34 @@ def test_trimedges():
     for edges, onlythis, expected in data:
         result = eppystuff.trimedges(edges, onlythis)
         assert result == expected
+        
+def test_hvacname2idfobj():
+    """py.test for hvacname2idfobj"""
+    idf = IDF(StringIO.StringIO(""))
+    plantloopname = "plantloopname"
+    branchname = "branchname"
+    pumpname = "pumpname"
+    zonename = "zonename"
+    plantloop = idf.newidfobject('PlantLoop'.upper(), 
+                    Name=plantloopname,
+                    Plant_Side_Inlet_Node_Name='CW Supply Inlet Node')
+    branch = idf.newidfobject('Branch'.upper(), 
+                    Name=branchname,
+                    Component_1_Inlet_Node_Name='CW Supply Inlet Node')
+    pump = idf.newidfobject('Pump:VariableSpeed'.upper(), 
+                    Name=pumpname,
+                    Inlet_Node_Name='CW Supply Inlet Node')
+    zone = idf.newidfobject('zone'.upper(), Name=zonename)
+    simulation = idf.newidfobject('SimulationControl'.upper()) 
+    # - test
+    names = [plantloopname, branchname, pumpname, zonename]
+    idfobjs = [plantloop, branch, pump, zone]
+    for name, idfobj in zip(names, idfobjs):
+        result = eppystuff.hvacname2idfobj(idf, name)
+        assert result == idfobj
+    # test when objkeys!=None
+    objkey = 'ZoneHVAC:EquipmentConnections'.upper()
+    equipconnections = idf.newidfobject(objkey,
+                        Zone_Name=zonename)
+    result = eppystuff.hvacname2idfobj(idf, zonename)
+    assert result == equipconnections

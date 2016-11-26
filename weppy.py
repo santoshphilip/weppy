@@ -11,6 +11,7 @@ from bottle import static_file
 import eppystuff
 import eppy.idf_helpers as idf_helpers
 from eppy.bunch_subclass import EpBunch
+from eppy.bunch_subclass import BadEPFieldError
 import documentationurls
 from documentationurls import getdoclink
 IMGFOLDER = "temporary_images"
@@ -246,7 +247,7 @@ def theidfobject(idfindex, keyindex, objindex):
     lines.append(mentioningobjslink)
     # - hvac links
     url = 'hvacprevnext/%s' % (objindex, )
-    hvacprevnextlink = 'HVAC object in loop -> <a href=%s>prev objects & next objects</a> (broken at zone level :-(' % (url, )
+    hvacprevnextlink = 'HVAC object in loop -> <a href=%s>prev objects & next objects</a>' % (url, )
     lines.append(hvacprevnextlink)
     # - 
     heading = '%s <a href=%s/key/iddinfo> %s</a>' % (objkey, objindex, '?')
@@ -463,20 +464,25 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     idfobjects = idf.idfobjects[objname]
     idfobject = idfobjects[objindex]
     from eppy import walk_hvac
-    nextnodes = walk_hvac.nextnode(edges, idfobject.Name)
-    nextobjs = [idf_helpers.name2idfobject(idf, Name=nnode) for nnode in nextnodes]
+    try:
+        idfobjectname = idfobject.Name
+    except BadEPFieldError as e:
+        idfobjectname = idfobject.Zone_Name
+    
+    nextnodes = walk_hvac.nextnode(edges, idfobjectname)
+    nextobjs = [eppystuff.hvacname2idfobj(idf, nnode) for nnode in nextnodes]
     keyobjids = [eppystuff.idfobjectindices(idf, nobj) for nobj in nextobjs]
     nurls = ["../../%s/%s" % (key_id, obj_id) for key_id, obj_id in keyobjids]
     nextlinks = ['<a href=%s>%s</a>' % (url, nnode)
                     for nnode, url in zip(nextnodes, nurls)]
     firstlines = [
-    "HVAC connections from %s named '%s'" % (objname, idfobject.Name),
+    "HVAC connections from %s named '%s'" % (objname, idfobjectname),
     "",
     "Next Objects",
     ]
     betweenlines = ["", "Previous Objects"]
-    prevnodes = walk_hvac.prevnode(edges, idfobject.Name)
-    prevobjs = [idf_helpers.name2idfobject(idf, Name=pnode) for pnode in prevnodes]
+    prevnodes = walk_hvac.prevnode(edges, idfobjectname)
+    prevobjs = [eppystuff.hvacname2idfobj(idf, pnode) for pnode in prevnodes]
     keyobjids = [eppystuff.idfobjectindices(idf, nobj) for nobj in prevobjs]
     try:
         purls = ["../../%s/%s" % (key_id, obj_id) 
@@ -486,7 +492,7 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     prevlinks = ['<a href=%s>%s</a>' % (url, pnode)
                     for pnode, url in zip(prevnodes, purls)]
     # image snippet
-    onlythis = [idfobject.Name, ] + nextnodes + prevnodes
+    onlythis = [idfobjectname, ] + nextnodes + prevnodes
     trimmed = eppystuff.trimedges(edges, onlythis)
     from eppy.useful_scripts import loopdiagram
     imgname = '%s_%s_%s' % (idfindex, keyindex, objindex)

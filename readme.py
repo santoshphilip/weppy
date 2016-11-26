@@ -6,28 +6,6 @@ txt = """<h1>weppy</h1>
 
 <p>Shows some of the interconnections between the idf objects</p>
 
-<h2>Installation</h2>
-
-<p>clone weppy</p>
-
-<p>git clone https://github.com/santoshphilip/weppy.git into a folder of your choice</p>
-
-<p>create a virtual environment</p>
-
-<p>pip install -r requirements.txt</p>
-
-<p>Note: weppy uses a modified version of eppy. If you already have eppy installed, unistall it by doing <code>pip uninstall eppy</code> then do <code>pip install -r requirements.txt</code></p>
-
-<h2>Running weppy</h2>
-
-<p>cd to the folder where you cloned weppy</p>
-
-<p>run:</p>
-
-<p>python weppy.py</p>
-
-<p>open "http://localhost:8080" in your browser</p>
-
 <h2>Playing with weppy</h2>
 
 <ul>
@@ -57,14 +35,6 @@ txt = """<h1>weppy</h1>
 
 <p>that is all so far.</p>
 
-<h2>where do the idf files come from</h2>
-
-<p>take a look at the file <code>idffilenames.txt</code></p>
-
-<h2>where does the idd file come from</h2>
-
-<p>It is hard coded in <code>eppystuff.py</code>. Change it if you need to.</p>
-
 <h2>Notes</h2>
 
 <ul>
@@ -76,5 +46,32 @@ txt = """<h1>weppy</h1>
 <ul><li>the eppy team may be motivated to write functions that will assist you in this.</li></ul></li>
 <li>Any comments or ideas for further development can be posted as an issue (or as a comment in an issue) in <a href="https://github.com/santoshphilip/weppy/issues">weppy</a></li>
 </ul>
+
+<h2>Installation</h2>
+
+<ul>
+<li>clone weppy</li>
+<li><code>git clone https://github.com/santoshphilip/weppy.git</code> into a folder of your choice</li>
+<li>create a virtual environment</li>
+<li>pip install -r requirements.txt</li>
+</ul>
+
+<p>Note: weppy uses a modified version of eppy. If you already have eppy installed, unistall it by doing <code>pip uninstall eppy</code> then do <code>pip install -r requirements.txt</code></p>
+
+<h2>Running weppy</h2>
+
+<ul>
+<li>cd to the folder where you cloned weppy</li>
+<li><code>python weppy.py</code></li>
+<li>open "http://localhost:8080" in your browser</li>
+</ul>
+
+<h2>where do the idf files come from</h2>
+
+<p>take a look at the file <code>idffilenames.txt</code></p>
+
+<h2>where does the idd file come from</h2>
+
+<p>It is hard coded in <code>eppystuff.py</code>. Change it if you need to.</p>
 
 """

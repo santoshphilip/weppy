@@ -4,10 +4,16 @@
 #  (See accompanying file LICENSE or copy at
 #  http://opensource.org/licenses/MIT)
 # =======================================================================
+from sys import argv
+
 from bottle import route, run
+from bottle import static_file
 import eppystuff
 import eppy.idf_helpers as idf_helpers
 from eppy.bunch_subclass import EpBunch
+import documentationurls
+from documentationurls import getdoclink
+IMGFOLDER = "temporary_images"
 
 aspace = "&emsp;"
 abullet = "&bull;"
@@ -20,18 +26,32 @@ def putfilenameontop(idf, lines):
     openfile = '<%s>%s</%s>' % ('h4', idf.idfname, 'h4')
     lines = [openfile, '<hr>'] + lines
     return lines
-
+    
 @route('/hello')
 def hello():
     return "Hello World!"
 
+@route('/static/<filepath:path>')
+def server_static(filepath):
+    imgpath = static_file(filepath, root='./%s' % (IMGFOLDER, ))
+    return imgpath
+
 @route('/')
 def homepage():
-    return '<a href=idf>view idf files</a>'
+    line1 = '<a href=readme>Readme</a>' 
+    line2 = '<a href=idf>view idf files</a>' 
+    line3 = '<img src="/static/a.png">'
+    lines = [line1] + [line2]
+    return '<BR>'.join(lines)
+
+@route('/readme')
+def readmepage():
+    import readme
+    return readme.txt
 
 @route('/idf')
 def idflist():
-    idfs = eppystuff.getidf()
+    idfs = eppystuff.getidfs()
     urls = ["idf/%s" % (i, ) for i in range(len(idfs))]
     lines = ['%s %s <a href=%s>%s</a>' % (i, abullet, url, idf.idfname)
                     for i, (url, idf) in enumerate(zip(urls, idfs))]
@@ -40,8 +60,7 @@ def idflist():
 
 @route('/idf/<idfindex:int>')
 def idf(idfindex):
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     objnames = idf_helpers.idfobjectkeys(idf)
     allidfobjects = [idf.idfobjects[objname.upper()] for objname in objnames]
     numobjects = [len(idfobjects) for idfobjects in allidfobjects]
@@ -49,27 +68,68 @@ def idf(idfindex):
             for i, (objname, num) in enumerate(zip(objnames, numobjects))
             if num > 0]
     urls = ["%s/%s" % (idfindex,i, ) for i, objname, num in objsnums]
+    # siteurl ="http://bigladdersoftware.com/epx/docs/8-3/input-output-reference/"
+    docurls = [getdoclink(objname.upper()) for i, objname, num in objsnums]
+    durltags = [' <a href=%s target="_blank">docs</a>' % (url, ) 
+                    for url in docurls]
     linktags = ['<a href=%s>%03d Items</a>' % (url, num, ) for (i, objname, num), url in zip(objsnums, urls)]
-    lines = ["""%s -> id:%03d - %s""" % (linktag, i, objname) for (i, objname, num), linktag in zip(objsnums, linktags)]
+    lines = ["""%s -> id:%03d - (%s) - %s""" % (linktag, i, durltag, objname) 
+            for (i, objname, num), linktag, durltag in zip(objsnums, linktags, durltags)]
     # openfile = 'open file = %s' % (idf.idfname, )
     # lines = [openfile, '<hr>'] + lines
+    url = "show_all/%s" % (idfindex, )
+    showmore = '<a href=%s>show more</a>' % (url, )
+    lines = [showmore, ""] + lines
     lines = putfilenameontop(idf, lines)
     html = "<br>".join(lines)
     return html
     
+@route('/idf/show_all/<idfindex:int>')
+def idf_all(idfindex):
+    idf, edges = eppystuff.an_idfedges(idfindex)
+    objnames = idf_helpers.idfobjectkeys(idf)
+    allidfobjects = [idf.idfobjects[objname.upper()] for objname in objnames]
+    numobjects = [len(idfobjects) for idfobjects in allidfobjects]
+    objsnums = [(i, objname, num)
+            for i, (objname, num) in enumerate(zip(objnames, numobjects))
+            if num >= 0]
+    urls = ["../%s/%s" % (idfindex,i, ) for i, objname, num in objsnums]
+    # siteurl ="http://bigladdersoftware.com/epx/docs/8-3/input-output-reference/"
+    docurls = [getdoclink(objname.upper()) for i, objname, num in objsnums]
+    durltags = [' <a href=%s target="_blank">docs</a>' % (url, ) 
+                    for url in docurls]
+    linktags = []
+    for (i, objname, num), url in zip(objsnums, urls):
+        if num:
+            linktag = '<a href=%s>%03d Items</a>' % (url, num, )
+        else:
+            linktag = '%03d Items' % (num, )
+            linktag = '_' * (len(linktag)-1)
+        linktags.append(linktag)
+    # linktags = ['<a href=%s>%03d Items</a>' % (url, num, ) for (i, objname,num), url in zip(objsnums, urls)]
+    lines = ["""%s -> id:%03d - (%s) - %s""" % (linktag, i, durltag, objname) 
+            for (i, objname, num), linktag, durltag in zip(objsnums, linktags, durltags)]
+    # openfile = 'open file = %s' % (idf.idfname, )
+    # lines = [openfile, '<hr>'] + lines
+    url = "../%s" % (idfindex, )
+    showless = '<a href=%s>show less</a>' % (url, )
+    lines = [showless, ""] + lines
+    lines = putfilenameontop(idf, lines)
+    html = "<br>".join(lines)
+    return html
+
 @route('/idf/<idfindex:int>/<keyindex:int>')
 def theidfobjects(idfindex, keyindex):
-    # try keyindex 84
-    print idfindex
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
     idfobjects = idf.idfobjects[objname]
     objnames = [(i, str(idfobject.obj[1])) for i, idfobject in enumerate(idfobjects)]
     linklines = ['<a href="%s/%s">%s %s %s</a>' % (keyindex, i, i, abullet, line, ) for i, line in objnames]
-    title = "ALL %sS" % (objname, )
-    lines = [title, '='*len(title)] + linklines
+    titledoc = '<a href="%s" target="_blank">docs</a>' % (getdoclink(objname.upper()))
+    justtitle = "ALL %sS" % (objname, )
+    title = '%s (%s)' % (justtitle, titledoc)
+    lines = [title, '='*len(justtitle)] + linklines
     lines = putfilenameontop(idf, lines)
     html = "<br>".join(lines)
     return html # codetag(html)
@@ -117,8 +177,7 @@ def funcsresults2lines(funcsresults):
     
 def getreferingobjs(idfindex, idfobject):
     """return html of referingobjs"""
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     refobjs = idfobject.getreferingobjs() 
     keys = [refobj.key for refobj in refobjs]   
     objnames = [refobj.obj[1] for refobj in refobjs] 
@@ -136,8 +195,7 @@ def getreferingobjs(idfindex, idfobject):
     
 def getmentioningobjs(idfindex, idfobject):
     """return the html of mentioning objs"""
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     mentioningobjs = idf_helpers.getanymentions(idf, idfobject)
     keys = [mentioningobj.key for mentioningobj in mentioningobjs]   
     objnames = [mentioningobj.obj[1] for mentioningobj in mentioningobjs] 
@@ -155,9 +213,7 @@ def getmentioningobjs(idfindex, idfobject):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>')
 def theidfobject(idfindex, keyindex, objindex):
-    # try keyindex 84
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
@@ -188,8 +244,15 @@ def theidfobject(idfindex, keyindex, objindex):
     url = 'mentioningobjs/%s' % (objindex, )
     mentioningobjslink = '<a href=%s>Show objects that mention this object</a>' % (url, )
     lines.append(mentioningobjslink)
+    # - hvac links
+    url = 'hvacprevnext/%s' % (objindex, )
+    hvacprevnextlink = 'HVAC object in loop -> <a href=%s>prev objects & next objects</a> (broken at zone level :-(' % (url, )
+    lines.append(hvacprevnextlink)
+    # - 
     heading = '%s <a href=%s/key/iddinfo> %s</a>' % (objkey, objindex, '?')
-    lineswithtitle = [heading, "=" * len(objkey)] + lines
+    headingdoc = '<a href="%s" target="_blank">docs</a>' % (getdoclink(objkey.upper()))
+    headingwithdoc = '%s (%s)' % (heading, headingdoc)
+    lineswithtitle = [headingwithdoc, "=" * len(objkey)] + lines
     lineswithtitle.insert(0, showmentionslink)
     lineswithtitle.insert(0, showlinkslink)
     lineswithtitle = putfilenameontop(idf, lineswithtitle)
@@ -198,9 +261,7 @@ def theidfobject(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/showlinks/<objindex:int>')
 def theidfobjectshowlinks(idfindex, keyindex, objindex):
-    # try keyindex 84
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
@@ -217,7 +278,7 @@ def theidfobjectshowlinks(idfindex, keyindex, objindex):
         if not obj1:
             refobjs[i] = obj2
     valuesfields = [(value, field) for value, field in zip(values, fields)]
-    urls = ["%s/%s" % (objindex, field) for field in fields]
+    urls = ["../%s/%s" % (objindex, field) for field in fields]
     linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,) 
                     for i, (url, value) in enumerate(zip(urls, values))]
     refobjtxts = [refobjlink(idf, refobj) for refobj in refobjs]
@@ -261,8 +322,7 @@ def makenodeobjtxts(idf, nodeobjlist):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/nodementions/<objindex:int>')
 def theidfobjectnodementions(idfindex, keyindex, objindex):
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
@@ -275,7 +335,7 @@ def theidfobjectnodementions(idfindex, keyindex, objindex):
         nodeobj = idf_helpers.getobjectswithnode(idf, nodekeys, value)
         nodeobjs.append(nodeobj)
     valuesfields = [(value, field) for value, field in zip(values, fields)]
-    urls = ["%s/%s" % (objindex, field) for field in fields]
+    urls = ["../%s/%s" % (objindex, field) for field in fields]
     linktags = ['<a href=%s>%s %s %s</a>' % (url, i, abullet, value,)
                     for i, (url, value) in enumerate(zip(urls, values))]
     nodeobjtxts = makenodeobjtxts(idf, nodeobjs)
@@ -291,8 +351,7 @@ def theidfobjectnodementions(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/objfunctions/<objindex:int>')
 def theidfobjectobjfunctions(idfindex, keyindex, objindex):
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
@@ -316,8 +375,7 @@ def theidfobjectobjfunctions(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/refferingobjs/<objindex:int>')
 def theidfobjectrefferingobjs(idfindex, keyindex, objindex):
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
@@ -340,8 +398,7 @@ def theidfobjectrefferingobjs(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/mentioningobjs/<objindex:int>')
 def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
     idfobjects = idf.idfobjects[objkey]
@@ -363,22 +420,17 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>/<field>')
 def theidfobjectfield(idfindex, keyindex, objindex, field):
-    # try keyindex 84
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
     idfobjects = idf.idfobjects[objname]
     idfobject = idfobjects[objindex]
     html = "%s <- %s . <i>Editable in the future</i>"  % (idfobject[field], field)
-    print html
     return codetag(html)
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>/<field>/iddinfo')
 def theiddinfo(idfindex, keyindex, objindex, field):
-    # try keyindex 84
-    idfs = eppystuff.getidf()
-    idf = idfs[idfindex]
+    idf, edges = eppystuff.an_idfedges(idfindex)
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
     idfobjects = idf.idfobjects[objname]
@@ -402,5 +454,50 @@ def theiddinfo(idfindex, keyindex, objindex, field):
     html = '<br>'.join(lines)
     return codetag(html)
 
-run(host='localhost', port=8080, debug=True)
+@route('/idf/<idfindex:int>/<keyindex:int>/hvacprevnext/<objindex:int>')
+def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
+    """hvac previous and next object"""
+    idf, edges = eppystuff.an_idfedges(idfindex)
+    objnames = idf_helpers.idfobjectkeys(idf)
+    objname = objnames[keyindex]
+    idfobjects = idf.idfobjects[objname]
+    idfobject = idfobjects[objindex]
+    from eppy import walk_hvac
+    nextnodes = walk_hvac.nextnode(edges, idfobject.Name)
+    nextobjs = [idf_helpers.name2idfobject(idf, nnode) for nnode in nextnodes]
+    keyobjids = [eppystuff.idfobjectindices(idf, nobj) for nobj in nextobjs]
+    nurls = ["../../%s/%s" % (key_id, obj_id) for key_id, obj_id in keyobjids]
+    nextlinks = ['<a href=%s>%s</a>' % (url, nnode)
+                    for nnode, url in zip(nextnodes, nurls)]
+    firstlines = [
+    "HVAC connections from %s named '%s'" % (objname, idfobject.Name),
+    "",
+    "Next Objects",
+    ]
+    betweenlines = ["", "Previous Objects"]
+    prevnodes = walk_hvac.prevnode(edges, idfobject.Name)
+    prevobjs = [idf_helpers.name2idfobject(idf, pnode) for pnode in prevnodes]
+    keyobjids = [eppystuff.idfobjectindices(idf, nobj) for nobj in prevobjs]
+    try:
+        purls = ["../../%s/%s" % (key_id, obj_id) 
+                    for key_id, obj_id in keyobjids]
+    except TypeError as e:
+        purls = []
+    prevlinks = ['<a href=%s>%s</a>' % (url, pnode)
+                    for pnode, url in zip(prevnodes, purls)]
+    # image snippet
+    onlythis = [idfobject.Name, ] + nextnodes + prevnodes
+    trimmed = eppystuff.trimedges(edges, onlythis)
+    from eppy.useful_scripts import loopdiagram
+    imgname = '%s_%s_%s' % (idfindex, keyindex, objindex)
+    eppystuff.save_imagesnippets(IMGFOLDER,imgname, trimmed)
+    imgline = ['<img src="../../../../../static/%s.png" alt="snippet">' % (imgname, )]
+    html = '<br>'.join(firstlines + nextlinks + betweenlines + prevlinks + imgline)
+    return html
+    
+    
+try:
+    run(host='0.0.0.0', port=argv[1]) # to run on heroku
+except IndexError as e:
+    run(host='localhost', port=8080, debug=True) # runs locally
 

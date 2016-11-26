@@ -1,6 +1,36 @@
+2016-11-25
+----------
+heroku buildpacks:add --index 1 heroku/python
+heroku buildpacks:add --index 2 https://github.com/weibeld/heroku-buildpack-graphviz.git
+git push heroku master
+
+OR this ?
+heroku buildpacks:set git://github.com/heroku/heroku-buildpack-python.git
+
+
+to uninstall
+heroku config:unset https://github.com/weibeld/heroku-buildpack-graphviz.git
+heroku buildpacks:remove https://github.com/weibeld/heroku-buildpack-graphviz.git
+
+2016-11-25
+----------
+TODO :
+- update the README.md, readme.py, 
+- deploy to heroku    
+- move the snippet generation functions to eppy
+- revisit the loop builded on the zone end
+- look for missing elements in the loopdiagram
+    - you can do this by checking for snippets in weppy
+2016-11-23
+----------
+http://daringfireball.net/projects/markdown/dingus
+for converions to html
+2016-11-23
+----------
+git push heroku mybranch:master
 2016-10-30
 ----------
-You may want to link to the html documentations too.
+You may want to link to the html documentations too. - DONE
 2016-10-26
 ----------
 url design
@@ -44,3 +74,15 @@ stage4
 ------
 - home page at http://localhost:8080
 - opens files in ./'./idffilenames.txt'
+
+stage5
+------
+- will show node connections
+
+stage6
+------
+- fully functional - no broken links
+
+stage7
+------
+- added documentation links

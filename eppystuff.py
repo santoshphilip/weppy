@@ -6,11 +6,14 @@
 # =======================================================================
 """just eppy stuff"""
 
+import os
+
 import StringIO
 from eppy.iddcurrent import iddcurrent
 import eppy.idf_helpers as idf_helpers
 from eppy.modeleditor import IDF
 from eppy.EPlusInterfaceFunctions.eplusdata import removecomment
+from eppy.useful_scripts import loopdiagram
 iddfile = './Energy+.idd'
 
 def getfnames(fnametxt='./idffilenames.txt'):
@@ -25,12 +28,26 @@ fnames = getfnames()
 if IDF.getiddname() == None:
     IDF.setiddname(iddfile)
 idfs = [IDF(fname) for fname in fnames]
+alledges = [loopdiagram.getedges(idf.idfname, iddfile) for idf in idfs]
 nodekeys = idf_helpers.getidfkeyswithnodes()
 
 
-def getidf():
+def getidfs():
     """return an idf"""
     return idfs
+    
+def getalledges():
+    """return edges"""
+    return alledges
+    
+def idfsandedges():
+    """return idfs and edges"""
+    return idfs, alledges
+    
+def an_idfedges(index):
+    """return a specific idf and it's edges"""
+    idfs, alledges = idfsandedges()
+    return idfs[index], alledges[index]
     
 def getnodekeys():
     """return keys that have node fields"""
@@ -47,4 +64,38 @@ def page2():
     nlen = [(name, ln)for name, ln in n_len if ln > 0]
     return nlen
 
-
+def idfobjectindices(idf, idfobj):
+    """return indices to construct the url for weppy"""
+    try:
+        objkey = idfobj.key
+    except AttributeError as e:
+        return None
+    key_id = idf_helpers.idfobjectkeys(idf).index(objkey.upper())
+    idfobjs = idf.idfobjects[objkey.upper()]
+    obj_id = idfobjs.index(idfobj)
+    return key_id, obj_id
+    
+def trimedges(edges, onlythis=None):
+    """trim the edges with onlythis"""
+    if not onlythis:
+        return edges
+    trimmed = []    
+    for item in edges:
+        a, b = item
+        if a in onlythis or b in onlythis:
+            trimmed.append(item)
+    return trimmed
+    
+def save_imagesnippets(imgfolder, imgname, trimmed):
+    """save images if they do not exist"""
+    imgpath = '%s/%s' % (imgfolder, imgname, )
+    print imgpath
+    if os.path.exists('%s.png' % (imgpath, )):
+        print "image exists"
+        return True
+    if not os.path.exists(imgfolder):
+        os.mkdir(imgfolder)
+    loopdiagram.save_diagram(imgpath, loopdiagram.makediagram(trimmed))
+    
+    
+        

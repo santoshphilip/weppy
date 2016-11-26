@@ -46,7 +46,9 @@ that is all so far.
 - create a virtual environment
 - pip install -r requirements.txt
 
-Note: weppy uses a modified version of eppy. If you already have eppy installed, unistall it by doing `pip uninstall eppy` then do `pip install -r requirements.txt`
+Note 1: weppy uses a modified version of eppy. If you already have eppy installed, unistall it by doing `pip uninstall eppy` then do `pip install -r requirements.txt`
+
+Note 2:Install `graphviz` from [here](http://www.graphviz.org/) to view the diagrams
 
 ## Running weppy
 - cd to the folder where you cloned weppy

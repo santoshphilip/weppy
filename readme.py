@@ -1,4 +1,5 @@
-txt = """<h1>weppy</h1>
+txt = """
+<h1>weppy</h1>
 
 <p>toy web viewer for eppy</p>
 
@@ -56,7 +57,9 @@ txt = """<h1>weppy</h1>
 <li>pip install -r requirements.txt</li>
 </ul>
 
-<p>Note: weppy uses a modified version of eppy. If you already have eppy installed, unistall it by doing <code>pip uninstall eppy</code> then do <code>pip install -r requirements.txt</code></p>
+<p>Note 1: weppy uses a modified version of eppy. If you already have eppy installed, unistall it by doing <code>pip uninstall eppy</code> then do <code>pip install -r requirements.txt</code></p>
+
+<p>Note 2:Install <code>graphviz</code> from <a href="http://www.graphviz.org/">here</a> to view the diagrams</p>
 
 <h2>Running weppy</h2>
 

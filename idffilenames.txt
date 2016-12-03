@@ -7,4 +7,8 @@
 ./examplefiles/5ZoneReturnFan.idf
 ./examplefiles/5ZoneAirCooled.idf
 ./examplefiles/1ZoneUncontrolled_DDChanges.idf
+/Applications/EnergyPlus-8-3-0/ExampleFiles/5ZoneDDCycOnOne.idf
+/Applications/EnergyPlus-8-3-0/ExampleFiles/5ZoneDetailedIceStorage2.idf
+/Applications/EnergyPlus-8-3-0/ExampleFiles/5ZoneDetailedIceStorage.idf
+/Applications/EnergyPlus-8-3-0/ExampleFiles/5ZoneDesignInputCoolingCoil.idf
 # /Users/santoshphilip/Dropbox/coolshadow/smithgroup/working/base28.idf

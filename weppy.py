@@ -13,6 +13,7 @@ from eppy.bunch_subclass import EpBunch
 from eppy.bunch_subclass import BadEPFieldError
 import documentationurls
 from documentationurls import getdoclink
+import openidf
 IMGFOLDER = "temporary_images"
 
 aspace = "&emsp;"
@@ -51,15 +52,17 @@ def readmepage():
 
 @route('/idf')
 def idflist():
-    idfs = eppystuff.getidfs()
-    urls = ["idf/%s" % (i, ) for i in range(len(idfs))]
-    lines = ['%s %s <a href=%s>%s</a>' % (i, abullet, url, idf.idfname)
-                    for i, (url, idf) in enumerate(zip(urls, idfs))]
+    fnames = eppystuff.fnames
+    urls = ["idf/%s" % (i, ) for i in range(len(fnames))]
+    lines = ['%s %s <a href=%s>%s</a>' % (i, abullet, url, fname)
+                    for i, (url, fname) in enumerate(zip(urls, fnames))]
     lines.insert(0, "<h3>IDF files you can view</h3>")
+    # idfs = eppystuff.getidfs()
     return '<br>'.join(lines)
 
 @route('/idf/<idfindex:int>')
 def idf(idfindex):
+    openidf.readidf(idfindex, eppystuff.fnames, eppystuff.idfs, eppystuff.alledges, eppystuff.nodekeys)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objnames = idf_helpers.idfobjectkeys(idf)
     allidfobjects = [idf.idfobjects[objname.upper()] for objname in objnames]

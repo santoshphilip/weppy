@@ -9,28 +9,21 @@
 import os
 
 import StringIO
-from eppy.iddcurrent import iddcurrent
 import eppy.idf_helpers as idf_helpers
-from eppy.modeleditor import IDF
-from eppy.EPlusInterfaceFunctions.eplusdata import removecomment
 from eppy.useful_scripts import loopdiagram
-iddfile = './Energy+.idd'
 
-def getfnames(fnametxt='./idffilenames.txt'):
-    """return the idf filenames"""
-    fhandle = open(fnametxt, 'r')
-    lines = (removecomment(line.strip(), "#") for line in fhandle)
-    lines = (line for line in lines if line)
-    for line in lines:
-        yield line
+import openidf 
 
-fnames = getfnames()
-if IDF.getiddname() == None:
-    IDF.setiddname(iddfile)
-idfs = [IDF(fname) for fname in fnames]
-alledges = [loopdiagram.getedges(idf.idfname, iddfile) for idf in idfs]
-nodekeys = idf_helpers.getidfkeyswithnodes()
 
+# fnames = getfnames()
+# if IDF.getiddname() == None:
+#     IDF.setiddname(iddfile)
+# idfs = [IDF(fname) for fname in fnames]
+# alledges = [loopdiagram.getedges(idf.idfname, iddfile) for idf in idfs]
+# nodekeys = idf_helpers.getidfkeyswithnodes()
+
+fnames = list(openidf.getfnames())
+idfs, alledges, nodekeys = openidf.initidfs(fnames)
 
 def getidfs():
     """return an idf"""

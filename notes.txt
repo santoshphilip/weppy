@@ -1,3 +1,14 @@
+2016-12-03
+----------
+- figure out how to do the entire example file directory.
+    - have only 5 (or n) files open at t time
+    - give each example file a index number. This will come in the url
+    - if file open:
+        continue
+    - else:
+        open file (if not open)
+        close another file if needed
+    - explore with a openidf module
 2016-11-26
 ----------
 - in the walk_hvac - code it so that it walks to
@@ -20,9 +31,9 @@ heroku buildpacks:remove https://github.com/weibeld/heroku-buildpack-graphviz.gi
 2016-11-25
 ----------
 TODO :
-- update the README.md, readme.py, 
-- deploy to heroku    
-- move the snippet generation functions to eppy
+- update the README.md, readme.py,  - DONE
+- deploy to heroku    - DONE
+- move the snippet generation functions to eppy - DONE
 - revisit the loop builded on the zone end
 - look for missing elements in the loopdiagram
     - you can do this by checking for snippets in weppy

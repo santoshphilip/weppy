@@ -86,6 +86,31 @@ def idf(idfindex):
     html = "<br>".join(lines)
     return html
     
+@route('/hvac/<idfindex:int>')
+def idf(idfindex):
+    eppystuff.idfqueue.put(idfindex)
+    idf, edges = eppystuff.an_idfedges(idfindex)
+    objnames = idf_helpers.idfobjectkeys(idf)
+    allidfobjects = [idf.idfobjects[objname.upper()] for objname in objnames]
+    numobjects = [len(idfobjects) for idfobjects in allidfobjects]
+    objsnums = [(i, objname, num)
+            for i, (objname, num) in enumerate(zip(objnames, numobjects))
+            if num > 0]
+    urls = ["%s/%s" % (idfindex,i, ) for i, objname, num in objsnums]
+    # siteurl ="http://bigladdersoftware.com/epx/docs/8-3/input-output-reference/"
+    docurls = [getdoclink(objname.upper()) for i, objname, num in objsnums]
+    durltags = [' <a href=%s target="_blank">docs</a>' % (url, ) 
+                    for url in docurls]
+    linktags = ['<a href=%s>%03d Items</a>' % (url, num, ) for (i, objname, num), url in zip(objsnums, urls)]
+    lines = ["""%s -> id:%03d - (%s) - %s""" % (linktag, i, durltag, objname) 
+            for (i, objname, num), linktag, durltag in zip(objsnums, linktags, durltags)]
+    url = "show_all/%s" % (idfindex, )
+    showmore = '<a href=%s>show more</a>' % (url, )
+    lines = [showmore, ""] + lines
+    lines = putfilenameontop(idf, lines)
+    html = "<br>".join(lines)
+    return html
+
 @route('/idf/show_all/<idfindex:int>')
 def idf_all(idfindex):
     eppystuff.idfqueue.put(idfindex)
@@ -112,8 +137,6 @@ def idf_all(idfindex):
     # linktags = ['<a href=%s>%03d Items</a>' % (url, num, ) for (i, objname,num), url in zip(objsnums, urls)]
     lines = ["""%s -> id:%03d - (%s) - %s""" % (linktag, i, durltag, objname) 
             for (i, objname, num), linktag, durltag in zip(objsnums, linktags, durltags)]
-    # openfile = 'open file = %s' % (idf.idfname, )
-    # lines = [openfile, '<hr>'] + lines
     url = "../%s" % (idfindex, )
     showless = '<a href=%s>show less</a>' % (url, )
     lines = [showless, ""] + lines

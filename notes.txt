@@ -1,38 +1,9 @@
+2016-12-04
+----------
+do lo=ist of hvac list of objects
 2016-12-03
 ----------
-- figure out how to do the entire example file directory.
-    - have only 5 (or n) files open at t time
-    - give each example file a index number. This will come in the url
-    - if file open:
-        continue
-    - else:
-        open file (if not open)
-        close another file if needed
-    - explore with a openidf module
-Use Queue to do this
-class IdfQ
-q = IdfQ(3)
-if q is full:
-    get
-if not in q:
-    put in q
-    openidf.readidf(idfindex)
-put put
-if full and not in q: get
-
-overrides:
-myput:
-    if not in q:
-        if not full:
-            put
-        else:
-            get
-            put
-get:
-openfile(i)
-
-
-        
+finished max n files open code - DONE
 2016-11-26
 ----------
 - in the walk_hvac - code it so that it walks to

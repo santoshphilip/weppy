@@ -22,7 +22,7 @@ import openidf
 # alledges = [loopdiagram.getedges(idf.idfname, iddfile) for idf in idfs]
 # nodekeys = idf_helpers.getidfkeyswithnodes()
 
-maxopen = 2
+maxopen = 5
 fnames = list(openidf.getfnames())
 idfs, alledges, nodekeys = openidf.initidfs(fnames)
 kwargs = dict(fnames=fnames, idfs=idfs, alledges=alledges, nodekeys=nodekeys)

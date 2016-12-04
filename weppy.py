@@ -56,13 +56,14 @@ def idflist():
     urls = ["idf/%s" % (i, ) for i in range(len(fnames))]
     lines = ['%s %s <a href=%s>%s</a>' % (i, abullet, url, fname)
                     for i, (url, fname) in enumerate(zip(urls, fnames))]
-    lines.insert(0, "<h3>IDF files you can view</h3>")
-    # idfs = eppystuff.getidfs()
-    return '<br>'.join(lines)
+    olines = [line for line, anidf in zip(lines, eppystuff.idfs) if anidf]
+    olines.insert(0, "<h3>open IDF files you can view (maximum = %s files)</h3>" % (eppystuff.maxopen))
+    lines.insert(0, "<h3>all available IDF files you can view</h3>")
+    return '<br>'.join(olines + lines)
 
 @route('/idf/<idfindex:int>')
 def idf(idfindex):
-    openidf.readidf(idfindex, eppystuff.fnames, eppystuff.idfs, eppystuff.alledges, eppystuff.nodekeys)
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objnames = idf_helpers.idfobjectkeys(idf)
     allidfobjects = [idf.idfobjects[objname.upper()] for objname in objnames]
@@ -78,8 +79,6 @@ def idf(idfindex):
     linktags = ['<a href=%s>%03d Items</a>' % (url, num, ) for (i, objname, num), url in zip(objsnums, urls)]
     lines = ["""%s -> id:%03d - (%s) - %s""" % (linktag, i, durltag, objname) 
             for (i, objname, num), linktag, durltag in zip(objsnums, linktags, durltags)]
-    # openfile = 'open file = %s' % (idf.idfname, )
-    # lines = [openfile, '<hr>'] + lines
     url = "show_all/%s" % (idfindex, )
     showmore = '<a href=%s>show more</a>' % (url, )
     lines = [showmore, ""] + lines
@@ -89,6 +88,7 @@ def idf(idfindex):
     
 @route('/idf/show_all/<idfindex:int>')
 def idf_all(idfindex):
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objnames = idf_helpers.idfobjectkeys(idf)
     allidfobjects = [idf.idfobjects[objname.upper()] for objname in objnames]
@@ -123,6 +123,7 @@ def idf_all(idfindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>')
 def theidfobjects(idfindex, keyindex):
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
@@ -216,6 +217,7 @@ def getmentioningobjs(idfindex, idfobject):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>')
 def theidfobject(idfindex, keyindex, objindex):
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
@@ -264,6 +266,7 @@ def theidfobject(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/showlinks/<objindex:int>')
 def theidfobjectshowlinks(idfindex, keyindex, objindex):
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
@@ -325,6 +328,7 @@ def makenodeobjtxts(idf, nodeobjlist):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/nodementions/<objindex:int>')
 def theidfobjectnodementions(idfindex, keyindex, objindex):
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
@@ -354,6 +358,7 @@ def theidfobjectnodementions(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/objfunctions/<objindex:int>')
 def theidfobjectobjfunctions(idfindex, keyindex, objindex):
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
@@ -378,6 +383,7 @@ def theidfobjectobjfunctions(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/refferingobjs/<objindex:int>')
 def theidfobjectrefferingobjs(idfindex, keyindex, objindex):
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
@@ -401,6 +407,7 @@ def theidfobjectrefferingobjs(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/mentioningobjs/<objindex:int>')
 def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objkeys = idf_helpers.idfobjectkeys(idf)
     objkey = objkeys[keyindex]
@@ -423,6 +430,7 @@ def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>/<field>')
 def theidfobjectfield(idfindex, keyindex, objindex, field):
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
@@ -433,6 +441,7 @@ def theidfobjectfield(idfindex, keyindex, objindex, field):
 
 @route('/idf/<idfindex:int>/<keyindex:int>/<objindex:int>/<field>/iddinfo')
 def theiddinfo(idfindex, keyindex, objindex, field):
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]
@@ -460,6 +469,7 @@ def theiddinfo(idfindex, keyindex, objindex, field):
 @route('/idf/<idfindex:int>/<keyindex:int>/hvacprevnext/<objindex:int>')
 def theidfobjectmentioningobjs(idfindex, keyindex, objindex):
     """hvac previous and next object"""
+    eppystuff.idfqueue.put(idfindex)
     idf, edges = eppystuff.an_idfedges(idfindex)
     objnames = idf_helpers.idfobjectkeys(idf)
     objname = objnames[keyindex]

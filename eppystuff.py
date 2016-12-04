@@ -22,8 +22,11 @@ import openidf
 # alledges = [loopdiagram.getedges(idf.idfname, iddfile) for idf in idfs]
 # nodekeys = idf_helpers.getidfkeyswithnodes()
 
+maxopen = 2
 fnames = list(openidf.getfnames())
 idfs, alledges, nodekeys = openidf.initidfs(fnames)
+kwargs = dict(fnames=fnames, idfs=idfs, alledges=alledges, nodekeys=nodekeys)
+idfqueue = openidf.IdfQ(maxopen, openidf.readidf, openidf.popidf, **kwargs)
 
 def getidfs():
     """return an idf"""
@@ -82,9 +85,7 @@ def trimedges(edges, onlythis=None):
 def save_imagesnippets(imgfolder, imgname, trimmed):
     """save images if they do not exist"""
     imgpath = '%s/%s' % (imgfolder, imgname, )
-    print imgpath
     if os.path.exists('%s.png' % (imgpath, )):
-        print "image exists"
         return True
     if not os.path.exists(imgfolder):
         os.mkdir(imgfolder)

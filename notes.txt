@@ -9,6 +9,30 @@
         open file (if not open)
         close another file if needed
     - explore with a openidf module
+Use Queue to do this
+class IdfQ
+q = IdfQ(3)
+if q is full:
+    get
+if not in q:
+    put in q
+    openidf.readidf(idfindex)
+put put
+if full and not in q: get
+
+overrides:
+myput:
+    if not in q:
+        if not full:
+            put
+        else:
+            get
+            put
+get:
+openfile(i)
+
+
+        
 2016-11-26
 ----------
 - in the walk_hvac - code it so that it walks to

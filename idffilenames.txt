@@ -6,6 +6,8 @@
 
 ./examplefiles/5ZoneReturnFan.idf
 ./examplefiles/5ZoneAirCooled.idf
+./examplefiles/t24amb1 - ab.idf
+./examplefiles/t24amb1 - ap.idf
 ./examplefiles/1ZoneUncontrolled_DDChanges.idf
 /Applications/EnergyPlus-8-3-0/ExampleFiles/5ZoneDDCycOnOne.idf
 /Applications/EnergyPlus-8-3-0/ExampleFiles/5ZoneDetailedIceStorage2.idf

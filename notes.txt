@@ -1,7 +1,10 @@
 2019-05-10
 ----------
-small change to trigger a redeploy
-
+On Heroku - upgraded from cedar-14 to heroku-18
+default python on this is python-3.6.8
+so
+- add file runtime.txt in root with contents:
+    python-3.7.16
 2016-11-26
 ----------
 - in the walk_hvac - code it so that it walks to
